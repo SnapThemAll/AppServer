@@ -5,10 +5,9 @@ import java.util.UUID
 
 import models.TrackData
 import models.analysis.TrackAnalysisSet
-import models.geometry.{Point, Track}
+import models.geometry.Point
 
 import scala.util.Random
-
 import play.api.libs.json.Json
 import play.api.mvc.Cookie
 import play.api.test.FakeRequest

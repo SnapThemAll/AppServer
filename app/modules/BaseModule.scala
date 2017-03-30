@@ -23,6 +23,5 @@ class BaseModule extends AbstractModule with ScalaModule with AkkaGuiceSupport {
     bind[AuthTokenService].to[AuthTokenServiceImpl]
     bind[UserService].to[UserServiceImpl]
     bind[TrackService].to[TrackServiceImpl]
-    bind[UserProfileService].to[UserProfileServiceImpl]
   }
 }

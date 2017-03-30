@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
 import models.services.TrackService
-import models.{TrackData, TrackFilterData}
+import models.TrackData
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -23,7 +23,6 @@ import play.api.mvc.{BodyParsers, Controller}
 class TrackController @Inject()(trackService: TrackService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import TrackData.implicitModelFormat
-  import TrackFilterData.trackFilterDataJsonFormat
   import Utils._
 
   /**
@@ -38,7 +37,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
       request.body.asOpt[TrackData] match {
         case Some(trackData) =>
           trackService.save(identity.userID, trackData).map { trackAddedID =>
-            Ok("Track " + trackAddedID + " correctly added")
+            Ok("models.Track " + trackAddedID + " correctly added")
           }
         case None => Future.successful(UnprocessableEntity("Parsing of the track failed"))
       }
@@ -123,7 +122,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
   def removeTrack(trackIDAsString: String) = silhouette.UserAwareAction.async { implicit request =>
     verifyAuthentication(request) { identity =>
       trackService.remove(identity.userID, UUID.fromString(trackIDAsString)).map { trackRemovedID =>
-        Ok("Track " + trackRemovedID + " correctly removed")
+        Ok("models.Track " + trackRemovedID + " correctly removed")
       }
     }.recover(recoverWhenRetrievingTrack)
   }

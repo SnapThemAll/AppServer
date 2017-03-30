@@ -44,7 +44,7 @@ class TrackServiceImplTest extends PlaySpec with InjectedActorSupport with Futur
   val trackData = TrackData(trackID, pointsAsXML.toString(), None)
   val track     = trackData.toTrack(userID)
 
-  "Track service" should {
+  "models.Track service" should {
 
     "analyze a newly inserted track" in new WithDAO[TrackDAO]("preserve_original") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")

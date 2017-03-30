@@ -1,9 +1,8 @@
-package models.geometry
+package models
 
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import models.analysis.TrackAnalysisSet
 import org.junit.Test
 
 class TrackTest {

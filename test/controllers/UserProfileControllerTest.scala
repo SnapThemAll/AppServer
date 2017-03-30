@@ -6,7 +6,7 @@ import java.util.UUID
 import com.mohiva.play.silhouette.impl.providers.OAuth2Constants
 import models.TrackData
 import models.analysis._
-import models.geometry.{Point, Track}
+import models.geometry.Point
 import models.profile.UserProfile
 import org.jfree.util.Log
 import org.scalatools.testing.Logger

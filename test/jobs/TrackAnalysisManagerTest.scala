@@ -9,15 +9,13 @@ import akka.util.Timeout
 import jobs.TrackAnalysisManager.{Analyze, Done, Pending}
 import models.analysis.{TrackAnalysisSet, TrackSpeed, TrackTime}
 import models.daos.TrackDAO
-import models.geometry.{Location, Point, Track}
+import models.geometry.{Location, Point}
 import testutils.WithDAO
 
 import scala.concurrent.duration._
 import scala.util.{Random, Success, Try}
-
 import play.api.libs.concurrent.InjectedActorSupport
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-
 import org.scalatestplus.play.PlaySpec
 
 class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with FutureAwaits with DefaultAwaitTimeout {
@@ -64,7 +62,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
   def getAnalyzedTrack(track: Track): Track =
     track.addAnalysis(speedAnalysis).addAnalysis(timeAnalysis(track.points.last.time))
 
-  "Track analysis manager" should {
+  "models.Track analysis manager" should {
 
     "preserve original track and set analysis field in response" in new WithDAO[TrackDAO]("preserve_original") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")

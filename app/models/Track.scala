@@ -1,14 +1,11 @@
-package models.geometry
+package models
 
 import java.time.ZonedDateTime
 import java.util.UUID
 
-import models.TrackData
-import models.analysis.{TrackAnalysis, TrackAnalysisSet, TrackAnalyzer, TrackDistance}
+import play.api.libs.json.Json
 import shapeless.Typeable
 import utils.xml.XMLWriter
-
-import play.api.libs.json.Json
 
 /**
   * The track object.

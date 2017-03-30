@@ -20,7 +20,7 @@ object Utils extends Logger {
   }
 
   def recoverWhenRetrievingTrack = {
-    val notFound = NotFound("Track not found. The trackID requested might be incorrect.")
+    val notFound = NotFound("models.Track not found. The trackID requested might be incorrect.")
     PartialFunction[Throwable, Result] {
       case _: NoSuchElementException => notFound
       case _: IllegalAccessException => notFound

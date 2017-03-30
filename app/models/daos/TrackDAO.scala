@@ -3,7 +3,6 @@ package models.daos
 import java.util.UUID
 
 import models.TrackFilter
-import models.geometry.Track
 
 import scala.concurrent.Future
 

@@ -8,13 +8,11 @@ import com.google.inject.name.Named
 import jobs.TrackAnalysisManager.Analyze
 import models.analysis.{Parameters, TimePredictor}
 import models.daos.TrackDAO
-import models.geometry.Track
 import models.{TrackData, TrackFilter}
 import utils.xml.XMLWriter
 
 import scala.concurrent.Future
 import scala.util.Success
-
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 /**

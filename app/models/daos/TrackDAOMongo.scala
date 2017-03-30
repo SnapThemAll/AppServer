@@ -4,12 +4,11 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import models.TrackFilter
-import models.geometry.{Location, Track}
+import models.geometry.Location
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.play.json._
 
 import scala.concurrent.Future
-
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 

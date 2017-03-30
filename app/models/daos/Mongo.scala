@@ -1,7 +1,6 @@
 package models.daos
 
 import com.google.inject.{Inject, Singleton}
-import models.geometry.Track
 import reactivemongo.api.{Cursor, DefaultDB, MongoConnection}
 import reactivemongo.play.json.collection.JSONCollection
 import utils.Logger
@@ -9,7 +8,6 @@ import utils.Logger
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.util.{Success, Try}
-
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.{Configuration, Environment, Mode}
 

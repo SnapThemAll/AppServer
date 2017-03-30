@@ -5,13 +5,11 @@ import java.util.UUID
 
 import models.TrackFilter
 import models.analysis.{TrackAnalysisSet, TrackSpeed}
-import models.geometry.{Location, Point, Track}
+import models.geometry.{Location, Point}
 import testutils.WithDAO
 
 import scala.util.Random
-
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-
 import org.scalatest.Matchers._
 import org.scalatestplus.play.PlaySpec
 

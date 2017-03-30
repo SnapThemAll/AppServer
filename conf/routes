@@ -1,0 +1,20 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                               controllers.Application.index
+GET     /isauthenticated                controllers.Application.isAuthenticated
+GET     /signout                        controllers.Application.signOut
+
+GET     /authenticate/:provider         controllers.SocialAuth.authenticate(provider)
+GET     /authenticate/token/:provider   controllers.SocialAuth.authenticateToken(provider)
+
+GET     /gettrack/:trackid              controllers.TrackController.getTrack(trackid)
+GET     /removetrack/:trackid           controllers.TrackController.removeTrack(trackid)
+GET     /getanalysis/:trackid           controllers.TrackController.getAnalysis(trackid)
+GET     /getalltracks                   controllers.TrackController.getAllTracks
+GET     /getpredictedtracks             controllers.TrackController.getPredictedTracks
+POST    /savetrack                      controllers.TrackController.saveTrack
+
+GET     /getprofile                     controllers.UserProfileController.getProfile

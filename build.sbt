@@ -1,8 +1,8 @@
-name := "SteepUpServer"
+name := "SnapThemAllServer"
 
 version := "1.0"
 
-lazy val steepupserver = (project in file(".")).enablePlugins(PlayScala)
+lazy val snapthemallserver = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.8"
 

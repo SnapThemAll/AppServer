@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.{LogoutEvent, Silhouette}
-import models.User.userJsonFormat
+import models.User.jsonFormat
 import utils.auth.DefaultEnv
 
 import scala.language.postfixOps

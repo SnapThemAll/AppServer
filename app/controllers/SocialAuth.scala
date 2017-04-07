@@ -32,7 +32,7 @@ class SocialAuth @Inject()(silhouette: Silhouette[DefaultEnv],
                            socialProviderRegistry: SocialProviderRegistry)
     extends Controller with Logger {
 
-  import User.userJsonFormat
+  import User.jsonFormat
 
   /**
     * Authenticates a user against a social provider.

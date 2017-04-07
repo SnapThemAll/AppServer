@@ -48,7 +48,7 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
       val track = getTrack()
       await(dao.save(track))
 
-      val trackFound = await(dao.find(track.trackID))
+      val trackFound = await(dao.findPicture(track.trackID))
       trackFound shouldBe defined
       trackFound.get shouldBe track
     }
@@ -110,7 +110,7 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
       await(dao.save(track))
       await(dao.remove(track.trackID, track.userID))
 
-      val trackFound = await(dao.find(track.trackID))
+      val trackFound = await(dao.findPicture(track.trackID))
       trackFound shouldBe None
     }
   }

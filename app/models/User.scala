@@ -45,5 +45,5 @@ object User {
   /**
     * An implicit writer to export a user to JSON. Import this in your scope to use Json.toJson on a user
     */
-  implicit val userJsonFormat = Json.format[User]
+  implicit val jsonFormat = Json.format[User]
 }

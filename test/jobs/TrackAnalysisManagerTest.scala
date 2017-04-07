@@ -132,7 +132,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
       val Done(futureAnalyzedTrack) = await((analysisManager ? Analyze(track)).mapTo[Done])
       await(futureAnalyzedTrack)
 
-      val optRetrieved = await(dao.find(userID = track.trackID))
+      val optRetrieved = await(dao.findPicture(userID = track.trackID))
       optRetrieved must not be empty
 
       val retrieved = optRetrieved.get

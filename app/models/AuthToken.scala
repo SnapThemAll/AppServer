@@ -16,5 +16,5 @@ import play.api.libs.json.Json
 case class AuthToken(id: UUID, userID: UUID, expiry: DateTime)
 
 object AuthToken {
-  implicit val authTokenJsonFormat = Json.format[AuthToken]
+  implicit val jsonFormat = Json.format[AuthToken]
 }

@@ -5,7 +5,7 @@ import java.util.UUID
 import com.google.inject.Inject
 import com.mohiva.play.silhouette.api.LoginInfo
 import models.User
-import models.User.userJsonFormat
+import models.User.jsonFormat
 import models.daos.UserDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json

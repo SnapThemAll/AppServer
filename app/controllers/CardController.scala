@@ -1,18 +1,17 @@
 package controllers
 
+import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
-import models.services.TrackService
-import models.TrackData
+import models.services.CardService
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
+import play.api.mvc.{BodyParsers, Controller}
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
-
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{BodyParsers, Controller}
 
 /**
   * Class that handles the request related to a track
@@ -20,10 +19,20 @@ import play.api.mvc.{BodyParsers, Controller}
   *
   * Check conf.routes to see what URL to use for your requests
   */
-class TrackController @Inject()(trackService: TrackService, silhouette: Silhouette[DefaultEnv]) extends Controller {
+class CardController @Inject()(cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
-  import TrackData.implicitModelFormat
   import Utils._
+
+  def uploadPicture(cardName: String) = silhouette.UserAwareAction.async(parse.temporaryFile) { implicit request =>
+    verifyAuthentication(request) { identity =>
+      val userID = identity.userID
+      val pictureURI = s"/tmp/picture/${userID}/${cardName}/"
+      request.body.moveTo(new File(pictureURI))
+      cardService.savePicture(userID, cardName, pictureURI).map( success => {
+        Ok("File uploaded")
+      })
+    }.recover(recoverFromInternalServerError)
+  }
 
   /**
     * Handles an authenticated request sending a track (as Json) to server to save it
@@ -32,11 +41,11 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
     *         The Result will be 200 if the user successfully saved his track.
     *         Otherwise : 401 if the user is not authenticated and 500 if there is an InternalServerError.
     */
-  def saveTrack = silhouette.UserAwareAction.async(BodyParsers.parse.json) { implicit request =>
+  def savePicture(cardName: String) = silhouette.UserAwareAction.async(BodyParsers.parse.json) { implicit request =>
     verifyAuthentication(request) { identity =>
       request.body.asOpt[TrackData] match {
         case Some(trackData) =>
-          trackService.save(identity.userID, trackData).map { trackAddedID =>
+          cardService.save(identity.userID, trackData).map { trackAddedID =>
             Ok("models.Track " + trackAddedID + " correctly added")
           }
         case None => Future.successful(UnprocessableEntity("Parsing of the track failed"))
@@ -55,7 +64,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
     */
   def getTrack(trackIDAsString: String) = silhouette.UserAwareAction.async { implicit request =>
     verifyAuthentication(request) { identity =>
-      trackService.retrieve(identity.userID, UUID.fromString(trackIDAsString)).map { track =>
+      cardService.retrieve(identity.userID, UUID.fromString(trackIDAsString)).map { track =>
         Ok(Json.toJson(track))
       }
     }.recover(recoverWhenRetrievingTrack)
@@ -72,7 +81,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
     */
   def getAnalysis(trackIDAsString: String) = silhouette.UserAwareAction.async { implicit request =>
     verifyAuthentication(request) { identity =>
-      trackService.retrieveAnalysis(identity.userID, UUID.fromString(trackIDAsString)).map { trackAnalysis =>
+      cardService.retrieveAnalysis(identity.userID, UUID.fromString(trackIDAsString)).map { trackAnalysis =>
         Ok(trackAnalysis)
       }
     }.recover(recoverWhenRetrievingTrack)
@@ -87,7 +96,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
     */
   def getAllTracks = silhouette.UserAwareAction.async { implicit request =>
     verifyAuthentication(request) { identity =>
-      trackService.retrieveAll(identity.userID).map { trackIDs =>
+      cardService.retrieveAll(identity.userID).map { trackIDs =>
         Ok(Json.toJson(trackIDs))
       }
     }.recover(recoverFromInternalServerError)
@@ -104,7 +113,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
   def getPredictedTracks = silhouette.UserAwareAction.async { implicit request =>
     verifyAuthentication(request) { identity =>
       val filter = request.body.asJson.getOrElse(Json.obj()).as[TrackFilterData]
-      trackService.retrievePredicted(filter.toTrackFilter(identity.userID)).map { predictedTracksAsXML =>
+      cardService.retrievePredicted(filter.toTrackFilter(identity.userID)).map { predictedTracksAsXML =>
         Ok(predictedTracksAsXML)
       }
     }.recover(recoverFromInternalServerError)
@@ -121,7 +130,7 @@ class TrackController @Inject()(trackService: TrackService, silhouette: Silhouet
     */
   def removeTrack(trackIDAsString: String) = silhouette.UserAwareAction.async { implicit request =>
     verifyAuthentication(request) { identity =>
-      trackService.remove(identity.userID, UUID.fromString(trackIDAsString)).map { trackRemovedID =>
+      cardService.removePicture(identity.userID, UUID.fromString(trackIDAsString)).map { trackRemovedID =>
         Ok("models.Track " + trackRemovedID + " correctly removed")
       }
     }.recover(recoverWhenRetrievingTrack)

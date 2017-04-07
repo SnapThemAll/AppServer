@@ -1,22 +1,22 @@
-package models.daos
+package models.daos.mongo
 
 import java.util.UUID
 
 import com.google.inject.Inject
-import models.TrackFilter
-import models.geometry.Location
+import models.Card
+import models.daos.CardDAO
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.play.json._
 
 import scala.concurrent.Future
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.Json
 
 /**
-  * Give access to the [[Track]] object.
+  * Give access to the [[Card]] object.
   * Uses ReactiveMongo to access the MongoDB database
   */
-class TrackDAOMongo @Inject()(mongoDB: Mongo) extends TrackDAO {
+class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
 
   private[this] def trackColl = mongoDB.collection("track")
 

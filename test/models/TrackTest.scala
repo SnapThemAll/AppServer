@@ -7,8 +7,8 @@ import org.junit.Test
 
 class TrackTest {
 
-  def makeTrack(points: IndexedSeq[Point], date: ZonedDateTime): Track =
-    Track(UUID.randomUUID(), UUID.randomUUID(), "", date, points, TrackAnalysisSet(), None)
+  def makeTrack(points: IndexedSeq[Point], date: ZonedDateTime): Card =
+    Card(UUID.randomUUID(), UUID.randomUUID(), "", date, points, TrackAnalysisSet(), None)
 
   @Test
   def testConstructor() = {
@@ -24,7 +24,7 @@ class TrackTest {
     val tags = List("Hello", "Mountain")
 
     val tr =
-      Track(java.util.UUID.fromString("a-b-c-d-e"),
+      Card(java.util.UUID.fromString("a-b-c-d-e"),
             java.util.UUID.fromString("a-b-c-d-e"),
             "",
             ZonedDateTime.now(),
@@ -32,7 +32,7 @@ class TrackTest {
             TrackAnalysisSet(),
             Some(tags))
 
-    assert(tr.trackID == java.util.UUID.fromString("a-b-c-d-e"))
+    assert(tr.cardID == java.util.UUID.fromString("a-b-c-d-e"))
     assert(tr.userID == java.util.UUID.fromString("a-b-c-d-e"))
     assert(tr.points == l)
     assert(tr.analyses.isEmpty)

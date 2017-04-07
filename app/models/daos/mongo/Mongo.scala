@@ -1,6 +1,8 @@
-package models.daos
+package models.daos.mongo
 
 import com.google.inject.{Inject, Singleton}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.{Configuration, Environment, Mode}
 import reactivemongo.api.{Cursor, DefaultDB, MongoConnection}
 import reactivemongo.play.json.collection.JSONCollection
 import utils.Logger
@@ -8,8 +10,6 @@ import utils.Logger
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.util.{Success, Try}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.{Configuration, Environment, Mode}
 
 /**
   * Class that contains everything related to the access to the Mongo database. It's aware of its environment:

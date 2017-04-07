@@ -1,17 +1,17 @@
-package models.daos
+package models.daos.mongo
 
 import java.util.UUID
 
 import com.google.inject.Inject
 import models.AuthToken
 import models.AuthToken.authTokenJsonFormat
+import models.daos.AuthTokenDAO
 import org.joda.time.DateTime
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
 import reactivemongo.play.json._
 
 import scala.concurrent.Future
-
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.Json
 
 /**
   * Give access to the [[AuthToken]] object.

@@ -7,7 +7,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import jobs.TrackAnalysisManager.{Analyze, Pending}
 import models.TrackData
-import models.daos.TrackDAO
+import models.daos.CardDAO
 import testutils.WithDAO
 
 import scala.concurrent.duration._
@@ -46,9 +46,9 @@ class TrackServiceImplTest extends PlaySpec with InjectedActorSupport with Futur
 
   "models.Track service" should {
 
-    "analyze a newly inserted track" in new WithDAO[TrackDAO]("preserve_original") {
+    "analyze a newly inserted track" in new WithDAO[CardDAO]("preserve_original") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")
-      val trackService    = inject[TrackService]
+      val trackService    = inject[CardService]
 
       await(trackService.save(userID, trackData))
 

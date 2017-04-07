@@ -36,29 +36,29 @@ object TrackFactory {
 
   def trackWithAddTrackRequest(implicit cookie: Cookie) = {
     val track = createTrackData(NUM_POINTS)
-    track -> FakeRequest(routes.TrackController.saveTrack()).withCookies(cookie).withJsonBody(Json.toJson(track))
+    track -> FakeRequest(routes.CardController.savePicture()).withCookies(cookie).withJsonBody(Json.toJson(track))
   }
   def invalidTrackWithAddTrackRequest(implicit cookie: Cookie) = {
     val track = createTrackData(NUM_POINTS)
     (track,
-     FakeRequest(routes.TrackController.saveTrack())
+     FakeRequest(routes.CardController.savePicture())
        .withCookies(cookie)
        .withJsonBody(Json.toJson("{incorrect json format for the track}")))
   }
 
   def getTrackRequest(track: TrackData)(implicit cookie: Cookie) =
-    FakeRequest(routes.TrackController.getTrack(track.trackID.toString)).withCookies(cookie)
+    FakeRequest(routes.CardController.getTrack(track.trackID.toString)).withCookies(cookie)
 
   def getAllTrackRequest(implicit cookie: Cookie) =
-    FakeRequest(routes.TrackController.getAllTracks()).withCookies(cookie)
+    FakeRequest(routes.CardController.getAllTracks()).withCookies(cookie)
 
   def getAnalysisRequest(track: TrackData)(implicit cookie: Cookie) =
-    FakeRequest(routes.TrackController.getAnalysis(track.trackID.toString)).withCookies(cookie)
+    FakeRequest(routes.CardController.getAnalysis(track.trackID.toString)).withCookies(cookie)
 
   def getPredictedTracksRequest(implicit cookie: Cookie) =
-    FakeRequest(routes.TrackController.getPredictedTracks()).withCookies(cookie)
+    FakeRequest(routes.CardController.getPredictedTracks()).withCookies(cookie)
 
   def removeTrackRequest(track: TrackData)(implicit cookie: Cookie) =
-    FakeRequest(routes.TrackController.removeTrack(track.trackID.toString)).withCookies(cookie)
+    FakeRequest(routes.CardController.removeTrack(track.trackID.toString)).withCookies(cookie)
 
 }

@@ -39,12 +39,12 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
   }
 
   "A TrackDAO" should {
-    "save a track" in new WithDAO[TrackDAO]("save_track") {
+    "save a track" in new WithDAO[CardDAO]("save_track") {
       val track      = getTrack()
       val trackAdded = await(dao.save(track))
       trackAdded shouldBe track
     }
-    "retrieves added track using trackID" in new WithDAO[TrackDAO]("save_and_retrieve_track") {
+    "retrieves added track using trackID" in new WithDAO[CardDAO]("save_and_retrieve_track") {
       val track = getTrack()
       await(dao.save(track))
 
@@ -52,7 +52,7 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
       trackFound shouldBe defined
       trackFound.get shouldBe track
     }
-    "retrieve shared tracks of others" in new WithDAO[TrackDAO]("retrieve_shared_tracks_of_others") {
+    "retrieve shared tracks of others" in new WithDAO[CardDAO]("retrieve_shared_tracks_of_others") {
       val userID     = UUID.randomUUID()
       val userTracks = Vector.fill(10)(getTrack(userID))
 
@@ -67,7 +67,7 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
       othersTracksRetrieved should have length othersQuantity
       othersTracksRetrieved foreach (_.userID should not be userID)
     }
-    "retrieve shared tracks based on filter" in new WithDAO[TrackDAO]("retrieve_shared_tracks_filter") {
+    "retrieve shared tracks based on filter" in new WithDAO[CardDAO]("retrieve_shared_tracks_filter") {
       val userID     = UUID.randomUUID()
       val userTracks = Vector.fill(10)(getTrack(userID))
 
@@ -94,7 +94,7 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
         t.loc shouldBe location
       }
     }
-    "retrieves all tracks of a user" in new WithDAO[TrackDAO]("save_and_retrieve_all_tracks") {
+    "retrieves all tracks of a user" in new WithDAO[CardDAO]("save_and_retrieve_all_tracks") {
       val userID = UUID.randomUUID()
       val track1 = getTrack(userID)
       val track2 = getTrack(userID)
@@ -105,7 +105,7 @@ class TrackDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
       val allTracksFound = await(dao.findAll(userID))
       allTracksFound.toSet shouldBe Set(track1, track2)
     }
-    "not retrieves deleted track" in new WithDAO[TrackDAO]("save_remove_and_retrieve_track") {
+    "not retrieves deleted track" in new WithDAO[CardDAO]("save_remove_and_retrieve_track") {
       val track = getTrack()
       await(dao.save(track))
       await(dao.remove(track.trackID, track.userID))

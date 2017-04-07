@@ -1,4 +1,4 @@
-package models.daos
+package models.daos.mongo
 
 import java.util.UUID
 
@@ -6,13 +6,12 @@ import com.google.inject.Inject
 import com.mohiva.play.silhouette.api.LoginInfo
 import models.User
 import models.User.userJsonFormat
-import reactivemongo.play.json._
-import reactivemongo.play.json.collection._
-
-import scala.concurrent.Future
-
+import models.daos.UserDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
+import reactivemongo.play.json._
+
+import scala.concurrent.Future
 
 /**
   * Give access to the [[User]] object.

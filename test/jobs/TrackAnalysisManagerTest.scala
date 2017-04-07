@@ -8,7 +8,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import jobs.TrackAnalysisManager.{Analyze, Done, Pending}
 import models.analysis.{TrackAnalysisSet, TrackSpeed, TrackTime}
-import models.daos.TrackDAO
+import models.daos.CardDAO
 import models.geometry.{Location, Point}
 import testutils.WithDAO
 
@@ -64,7 +64,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
 
   "models.Track analysis manager" should {
 
-    "preserve original track and set analysis field in response" in new WithDAO[TrackDAO]("preserve_original") {
+    "preserve original track and set analysis field in response" in new WithDAO[CardDAO]("preserve_original") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")
 
       val track = getTrack()
@@ -75,7 +75,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
       analyzedTrack.analyses must not be empty
       track.copy(analyses = analyzedTrack.analyses) mustBe analyzedTrack
     }
-    "really be done when he tells so" in new WithDAO[TrackDAO]("really_done") {
+    "really be done when he tells so" in new WithDAO[CardDAO]("really_done") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")
 
       val track = getTrack()
@@ -86,7 +86,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
       val response2 = await(analysisManager ? Analyze(track))
       response2 must not be a[Pending] //He shouldn't be already analysing this track (he answered done before)
     }
-    "correctly set all the analyses" in new WithDAO[TrackDAO]("correctly_set_all_analyses") {
+    "correctly set all the analyses" in new WithDAO[CardDAO]("correctly_set_all_analyses") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")
 
       val track = getTrack()
@@ -96,7 +96,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
 
       analyzedTrack.analyses must have size 5
     }
-    "tell pending if already analyzing a track" in new WithDAO[TrackDAO]("tell_pending") {
+    "tell pending if already analyzing a track" in new WithDAO[CardDAO]("tell_pending") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")
 
       val track = getTrack()
@@ -124,7 +124,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
       retry must not be a[Pending] //Should have cancelled the job because of last failure => should accept this one
     }
     */
-    "correctly insert analyzed track into the DAO" in new WithDAO[TrackDAO]("correctly_insert_analyzed") {
+    "correctly insert analyzed track into the DAO" in new WithDAO[CardDAO]("correctly_insert_analyzed") {
       val analysisManager = injectNamed[ActorRef]("track-analysis-manager-actor")
 
       val track = getTrack()
@@ -132,7 +132,7 @@ class TrackAnalysisManagerTest extends PlaySpec with InjectedActorSupport with F
       val Done(futureAnalyzedTrack) = await((analysisManager ? Analyze(track)).mapTo[Done])
       await(futureAnalyzedTrack)
 
-      val optRetrieved = await(dao.find(trackID = track.trackID))
+      val optRetrieved = await(dao.find(userID = track.trackID))
       optRetrieved must not be empty
 
       val retrieved = optRetrieved.get

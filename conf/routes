@@ -10,11 +10,11 @@ GET     /signout                        controllers.Application.signOut
 GET     /authenticate/:provider         controllers.SocialAuth.authenticate(provider)
 GET     /authenticate/token/:provider   controllers.SocialAuth.authenticateToken(provider)
 
-GET     /gettrack/:trackid              controllers.TrackController.getTrack(trackid)
-GET     /removetrack/:trackid           controllers.TrackController.removeTrack(trackid)
-GET     /getanalysis/:trackid           controllers.TrackController.getAnalysis(trackid)
-GET     /getalltracks                   controllers.TrackController.getAllTracks
-GET     /getpredictedtracks             controllers.TrackController.getPredictedTracks
-POST    /savetrack                      controllers.TrackController.saveTrack
+GET     /gettrack/:trackid              controllers.CardController.getTrack(trackid)
+GET     /removetrack/:trackid           controllers.CardController.removeTrack(trackid)
+GET     /getanalysis/:trackid           controllers.CardController.getAnalysis(trackid)
+GET     /getalltracks                   controllers.CardController.getAllTracks
+GET     /getpredictedtracks             controllers.CardController.getPredictedTracks
+POST    /savetrack                      controllers.CardController.savePicture
 
 GET     /getprofile                     controllers.UserProfileController.getProfile

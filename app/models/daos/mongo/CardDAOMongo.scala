@@ -11,6 +11,7 @@ import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.play.json._
 
 import scala.concurrent.Future
+import scala.util.Random
 
 /**
   * Give access to the [[Card]] object.
@@ -18,50 +19,52 @@ import scala.concurrent.Future
   */
 class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
 
-  private[this] def trackColl = mongoDB.collection("track")
+  private[this] def cardColl = mongoDB.collection("card")
 
-  trackColl.map(_.indexesManager.ensure(Index(Seq("loc" -> IndexType.Geo2DSpherical))))
+  override def find(userID: UUID, cardName: String): Future[Option[Card]] =
+    cardColl.flatMap(_.find(Json.obj("userID" -> userID), "cardName" -> cardName).one[Card])
 
-  override def find(trackID: UUID): Future[Option[Track]] =
-    trackColl.flatMap(_.find(Json.obj("trackID" -> trackID)).one[Track])
+  override def findAll(userID: UUID): Future[IndexedSeq[Card]] =
+    cardColl.flatMap(
+      _.find(Json.obj("userID" -> userID))
+      .cursor[Card]()
+      .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAll in card dao"))
+    ).map(_.toIndexedSeq)
 
-  override def findShared(filter: TrackFilter): Future[Seq[Track]] = {
-    trackColl.flatMap(
-        _.find(
-            Json.obj(
-                "userID" -> Json.obj("$ne"   -> filter.userID),
-                "loc"    -> Json.obj("$near" -> Json.obj("$geometry" -> Location(filter.nearLat, filter.nearLng)))
-            )).cursor[Track]().collect[Seq](filter.amount, Mongo.cursonErrorHandler[Track]("findShared in track dao")))
-  }
-
-  override def findShared(userID: UUID, max: Int): Future[Seq[Track]] = {
-    trackColl.flatMap(
-        _.find(Json.obj("userID" -> Json.obj("$ne" -> userID)))
-          .cursor[Track]()
-          .collect[Seq](max, Mongo.cursonErrorHandler[Track]("findShared in track dao")))
-  }
-
-  override def findAll(userID: UUID, limit: Int = -1): Future[Seq[Track]] = {
-    trackColl.flatMap(
-        _.find(Json.obj("userID" -> userID))
-          .cursor[Track]()
-          .collect[Seq](limit, Mongo.cursonErrorHandler[Track]("findAll in track dao")))
-  }
-
-  override def save(track: Track): Future[Track] = {
-    trackColl
-      .flatMap(_.update(Json.obj("trackID" -> track.trackID), track, upsert = true))
+  override def save(card: Card): Future[Card] =
+    cardColl
+      .flatMap(_.update(Json.obj("userID" -> card.userID, "cardName" -> card.cardName), card))
       .transform(
-          _ => track,
-          t => t
+        _ => card,
+        t => t
       )
+  override def savePicture(userID: UUID, cardName: String, pictureURI: String): Future[Card] = {
+    find(userID, cardName)
+      .map{ cardAlreadyStored =>
+        save(cardAlreadyStored.getOrElse(Card(cardName, userID, IndexedSeq(pictureURI), Random.nextDouble() * 10)))
+      }.flatMap(cardSaved => cardSaved)
   }
 
-  override def remove(trackID: UUID, userID: UUID): Future[Unit] =
-    trackColl
-      .flatMap(_.remove(Json.obj("trackID" -> trackID, "userID" -> userID)))
+  override def remove(userID: UUID, cardName: String): Future[Unit] =
+    cardColl
+      .flatMap(_.remove(Json.obj("userID" -> userID, "cardName" -> cardName)))
       .transform(
-          _ => (),
-          t => t
+        _ => (),
+        t => t
       )
+
+
+  override def removePicture(userID: UUID, cardName: String, pictureURI: String): Future[Option[Card]] = {
+    find(userID, cardName)
+      .map{cardAlreadyStored =>
+        if(cardAlreadyStored.isEmpty || (cardAlreadyStored.get.picturesURI.toSet - pictureURI).isEmpty){
+          Future.successful(None)
+        } else {
+          val cardToStore = cardAlreadyStored.get
+            .copy(picturesURI = (cardAlreadyStored.get.picturesURI.toSet - pictureURI).toIndexedSeq)
+          save(cardToStore).map(Some(_))
+        }
+      }.flatMap(cardSaved => cardSaved)
+  }
+
 }

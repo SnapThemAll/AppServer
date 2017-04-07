@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.inject.Inject
 import models.AuthToken
-import models.AuthToken.authTokenJsonFormat
+import models.AuthToken.jsonFormat
 import models.daos.AuthTokenDAO
 import org.joda.time.DateTime
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

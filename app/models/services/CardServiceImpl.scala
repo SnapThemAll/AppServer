@@ -7,6 +7,7 @@ import models.Card
 import models.daos.CardDAO
 
 import scala.concurrent.Future
+import scala.util.Random
 
 /**
   * Handles actions to cards.
@@ -19,12 +20,19 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
     cardDAO.save(card)
   }
 
-  override def retrieve(userID: UUID, cardName: String, pictureURI: String): Future[Option[Card]] = {
-    cardDAO.find(userID, cardName, pictureURI)
+  override def savePicture(userID: UUID, cardName: String, pictureURI: String): Future[Double] = {
+    cardDAO.savePicture(userID, cardName, pictureURI).map(card => card.score)
   }
 
-  override def retrieveAllPicturesURI(userID: UUID, cardName: String): Future[Seq[String]] = {
-    cardDAO.findAllPicturesURI(userID, cardName)
+  override def retrieve(userID: UUID, cardName: String): Future[Option[Card]] = {
+    cardDAO.find(userID, cardName)
+  }
+
+  override def retrievePicturesURI(userID: UUID, cardName: String): Future[IndexedSeq[String]] = {
+    cardDAO.find(userID, cardName)
+      .map{ card =>
+        card.flatMap(_.picturesURI).toIndexedSeq
+      }
   }
 
   override def retrieveAll(userID: UUID): Future[Seq[Card]] = {
@@ -41,7 +49,12 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
       }
   }
 
-  override def removePicture(userID: UUID, cardName: String, pictureURI: String): Future[Unit] = {
+  override def remove(userID: UUID, cardName: String): Future[Unit] = {
+    cardDAO.remove(userID, cardName)
+  }
+
+  override def removePicture(userID: UUID, cardName: String, pictureURI: String): Future[Option[Card]] = {
     cardDAO.removePicture(userID, cardName, pictureURI)
   }
+
 }

@@ -12,7 +12,6 @@ import play.api.libs.json.Json
 case class Card(cardName: String,
                 userID: UUID,
                 picturesURI: IndexedSeq[String],
-                awaitingPicturesURI: IndexedSeq[String],
                 score: Double
                ) {
   require(score >= 0.0)
@@ -23,7 +22,7 @@ case class Card(cardName: String,
 object Card {
 
   /**
-    * An implicit writer to export a track to JSON. Import this in your scope to use Json.toJson on a track
+    * An implicit writer to export a card to JSON. Import this in your scope to use Json.toJson on a card.
     */
-  implicit val implicitModelFormat = Json.format[Card]
+  implicit val jsonFormat = Json.format[Card]
 }

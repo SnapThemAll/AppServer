@@ -7,7 +7,6 @@ import models.Card
 import models.daos.CardDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
-import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.play.json._
 
 import scala.concurrent.Future
@@ -19,10 +18,14 @@ import scala.util.Random
   */
 class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
 
+  implicit val cardJsonFormat = Card.jsonFormat
+
   private[this] def cardColl = mongoDB.collection("card")
 
   override def find(userID: UUID, cardName: String): Future[Option[Card]] =
-    cardColl.flatMap(_.find(Json.obj("userID" -> userID), "cardName" -> cardName).one[Card])
+    cardColl.flatMap(
+      _.find(Json.obj("userID" -> userID, "cardName" -> cardName)).one[Card]
+    )
 
   override def findAll(userID: UUID): Future[IndexedSeq[Card]] =
     cardColl.flatMap(

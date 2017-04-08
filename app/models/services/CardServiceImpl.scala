@@ -7,8 +7,7 @@ import models.Card
 import models.daos.CardDAO
 
 import scala.concurrent.Future
-import scala.util.Random
-
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 /**
   * Handles actions to cards.
   *
@@ -30,12 +29,12 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
 
   override def retrievePicturesURI(userID: UUID, cardName: String): Future[IndexedSeq[String]] = {
     cardDAO.find(userID, cardName)
-      .map{ card =>
-        card.flatMap(_.picturesURI).toIndexedSeq
+      .map{ maybeCard =>
+        maybeCard.map(_.picturesURI).getOrElse(IndexedSeq.empty)
       }
   }
 
-  override def retrieveAll(userID: UUID): Future[Seq[Card]] = {
+  override def retrieveAll(userID: UUID): Future[IndexedSeq[Card]] = {
     cardDAO.findAll(userID)
   }
 

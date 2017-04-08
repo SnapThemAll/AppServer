@@ -12,9 +12,8 @@ scalacOptions ++= Seq(
     "-unchecked", // Enable additional warnings where generated code depends on assumptions.
     "-Xlint" // Enable recommended additional warnings.
 )
-
 libraryDependencies ++= Seq(
-    jdbc,
+    /*jdbc,*/
     cache,
     ws,
     specs2                   % Test,
@@ -27,7 +26,7 @@ libraryDependencies ++= Seq(
     "com.mohiva"        %% "play-silhouette-crypto-jca"      % "4.0.0",
     "com.mohiva"        %% "play-silhouette-persistence"     % "4.0.0",
     "com.mohiva"        %% "play-silhouette-testkit"         % "4.0.0" % "test",
-    "org.reactivemongo" %% "play2-reactivemongo"             % "0.12.0",
+    "org.reactivemongo" %% "play2-reactivemongo"             % "0.12.1",
     //breeze
     "org.scalanlp" %% "breeze"         % "0.12",
     "org.scalanlp" %% "breeze-natives" % "0.12",

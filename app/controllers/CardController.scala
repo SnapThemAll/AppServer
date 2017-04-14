@@ -6,10 +6,12 @@ import com.mohiva.play.silhouette.api.Silhouette
 import models.services.CardService
 import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
 import play.api.mvc.Controller
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
+import scala.util.Random
 
 /**
   * Class that handles the request related to a track
@@ -22,6 +24,9 @@ class CardController @Inject()(configuration: Configuration ,cardService: CardSe
   import Utils._
 
   def uploadPicture(cardName: String) = silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
+
+    implicit val uploadModelFormat = UploadResponse.modelFormat
+
     verifyAuthentication(request) { identity =>
       Future.successful(request.body.file("picture").map { picture =>
         import java.io.File
@@ -34,7 +39,7 @@ class CardController @Inject()(configuration: Configuration ,cardService: CardSe
 
         new File(pictureFolderURI).mkdirs()
         picture.ref.moveTo(new File(pictureURI))
-        Ok("File uploaded")
+        Ok(Json.toJson(UploadResponse.randomScore))
       }.getOrElse {
         UnprocessableEntity("Could not upload file")
       }
@@ -51,4 +56,16 @@ class CardController @Inject()(configuration: Configuration ,cardService: CardSe
   }
 
 
+}
+
+case class UploadResponse(score: Double) {
+
+}
+
+object UploadResponse {
+  def randomScore: UploadResponse = {
+    UploadResponse(Random.nextDouble()*10)
+  }
+
+  implicit val modelFormat = Json.format[UploadResponse]
 }

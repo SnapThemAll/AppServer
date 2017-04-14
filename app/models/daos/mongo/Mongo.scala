@@ -74,8 +74,8 @@ class Mongo @Inject()(environment: Environment, configuration: Configuration) ex
       connection.database(database + dbSuffix)
     case _ =>
       logger.error(
-          s"Can't find config for Mongo database name under $configPath.database. Will use default db: steepup")
-      connection.database("steepup" + dbSuffix)
+          s"Can't find config for Mongo database name under $configPath.database. Will use default db: snapthemall")
+      connection.database("snapthemall" + dbSuffix)
   }
 
   //If we are in tests, start with a fresh DB

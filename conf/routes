@@ -10,11 +10,14 @@ GET     /signout                        controllers.Application.signOut
 GET     /authenticate/:provider         controllers.SocialAuth.authenticate(provider)
 GET     /authenticate/token/:provider   controllers.SocialAuth.authenticateToken(provider)
 
-#GET DATA
+#GET GAME DATA
+GET     /getlevels                      controllers.GameController.getLevels
+
+#GET CARD DATA
 GET     /getpic/:cardName/:fileName     controllers.CardController.getPicture(cardName, fileName)
 GET     /getpicdata                     controllers.CardController.getPicturesData
 GET     /getscore/:fbID                 controllers.CardController.getScore(fbID)
 
-#ADD/REMOVE DATA
+#ADD/REMOVE CARD DATA
 POST    /uploadpic/:cardName            controllers.CardController.uploadPicture(cardName)
 GET     /removepic/:cardName/:fileName  controllers.CardController.removePicture(cardName, fileName)

@@ -21,7 +21,7 @@ import scala.concurrent.Future
   *
   * Check conf.routes to see what URL to use for your requests
   */
-class CardController @Inject()(configuration: Configuration ,cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
+class CardController @Inject()(configuration: Configuration, cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
   val absPathToSave: String = configuration.getString("my.data.path").getOrElse("/tmp/")

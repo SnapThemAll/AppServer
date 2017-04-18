@@ -19,8 +19,8 @@ object Utils extends Logger {
     }
   }
 
-  def recoverWhenRetrievingTrack = {
-    val notFound = NotFound("models.Track not found. The trackID requested might be incorrect.")
+  def recoverWhenRetrievingPicture = {
+    val notFound = NotFound("Picture not found. Verify 'cardName' and 'fileName'")
     PartialFunction[Throwable, Result] {
       case _: NoSuchElementException => notFound
       case _: IllegalAccessException => notFound

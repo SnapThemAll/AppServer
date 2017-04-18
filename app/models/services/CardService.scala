@@ -1,8 +1,6 @@
 package models.services
 
-import java.util.UUID
-
-import models.Card
+import models.{Card, Picture}
 
 import scala.concurrent.Future
 
@@ -11,19 +9,15 @@ import scala.concurrent.Future
   */
 trait CardService {
 
-  def save(card: Card): Future[Card]
+  def savePicture(fbID: String, cardName: String, fileName: String): Future[Double]
 
-  def savePicture(userID: UUID, cardName: String, pictureURI: String): Future[Double]
+  def retrieve(fbID: String, cardName: String): Future[Option[Card]]
 
-  def retrieve(userID: UUID, cardName: String): Future[Option[Card]]
+  def retrievePicture(fbID: String, cardName: String, fileName: String): Future[Option[Picture]]
 
-  def retrievePicturesURI(userID: UUID, cardName: String): Future[IndexedSeq[String]]
+  def retrieveAll(fbID: String): Future[IndexedSeq[Card]]
 
-  def retrieveAll(userID: UUID): Future[IndexedSeq[Card]]
+  def computeTotalScore(fbID: String): Future[Double]
 
-  def computeTotalScore(userID: UUID): Future[Double]
-
-  def remove(userID: UUID, cardName: String): Future[Unit]
-
-  def removePicture(userID: UUID, cardName: String, pictureURI: String): Future[Option[Card]]
+  def removePicture(fbID: String, cardName: String, fileName: String): Future[Option[Card]]
 }

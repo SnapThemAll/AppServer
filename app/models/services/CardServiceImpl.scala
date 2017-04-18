@@ -1,13 +1,13 @@
 package models.services
 
-import java.util.UUID
 import javax.inject.Inject
 
-import models.Card
+import models.{Card, Picture}
 import models.daos.CardDAO
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 /**
   * Handles actions to cards.
   *
@@ -15,45 +15,39 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
   */
 class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
 
-  override def save(card: Card): Future[Card] = {
-    cardDAO.save(card)
+  override def savePicture(fbID: String, cardName: String, fileName: String): Future[Double] = {
+    cardDAO.savePicture(fbID, cardName, fileName)
   }
 
-  override def savePicture(userID: UUID, cardName: String, pictureURI: String): Future[Double] = {
-    cardDAO.savePicture(userID, cardName, pictureURI).map(card => card.score)
+  override def retrieve(fbID: String, cardName: String): Future[Option[Card]] = {
+    cardDAO.find(fbID, cardName).map{ maybeCard =>
+      maybeCard.map(_.getNotDeleted).filter(_.pictures.nonEmpty)
+    }
   }
 
-  override def retrieve(userID: UUID, cardName: String): Future[Option[Card]] = {
-    cardDAO.find(userID, cardName)
+  override def retrievePicture(fbID: String, cardName: String, fileName: String): Future[Option[Picture]] = {
+    retrieve(fbID, cardName).map{ maybeCard =>
+      maybeCard.flatMap(_.pictures.find(_.fileName == fileName))
+    }
   }
 
-  override def retrievePicturesURI(userID: UUID, cardName: String): Future[IndexedSeq[String]] = {
-    cardDAO.find(userID, cardName)
-      .map{ maybeCard =>
-        maybeCard.map(_.picturesURI).getOrElse(IndexedSeq.empty)
-      }
+  override def retrieveAll(fbID: String): Future[IndexedSeq[Card]] = {
+    cardDAO.findAll(fbID).map{ cards =>
+      cards.map(_.getNotDeleted).filter(_.pictures.nonEmpty)
+    }
   }
 
-  override def retrieveAll(userID: UUID): Future[IndexedSeq[Card]] = {
-    cardDAO.findAll(userID)
-  }
-
-  override def computeTotalScore(userID: UUID): Future[Double] = {
-    cardDAO.findAll(userID)
+  override def computeTotalScore(fbID: String): Future[Double] = {
+    retrieveAll(fbID)
       .map{ cards =>
         cards
           .groupBy( _.cardName )
-          .map{ case(_, cardsByName) => cardsByName.map( _.score).max }
-          .sum
+          .map{ case(_, cardsByName) => cardsByName.map( _.bestScore ).max }
+          .foldLeft(0d)(_ + _)
       }
   }
 
-  override def remove(userID: UUID, cardName: String): Future[Unit] = {
-    cardDAO.remove(userID, cardName)
+  override def removePicture(fbID: String, cardName: String, fileName: String): Future[Option[Card]] = {
+    cardDAO.removePicture(fbID, cardName, fileName)
   }
-
-  override def removePicture(userID: UUID, cardName: String, pictureURI: String): Future[Option[Card]] = {
-    cardDAO.removePicture(userID, cardName, pictureURI)
-  }
-
 }

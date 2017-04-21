@@ -26,7 +26,7 @@ class CardController @Inject()(configuration: Configuration, cardService: CardSe
   import Utils._
   val absPathToSave: String = configuration.getString("my.data.path").getOrElse("/tmp/")
 
-  def uploadPicture(cardName: String): Action[MultipartFormData[Files.TemporaryFile]] =
+  def uploadPicture(cardID: String): Action[MultipartFormData[Files.TemporaryFile]] =
     silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
       implicit val uploadModelFormat = PictureUploadResponse.modelFormat
 
@@ -36,11 +36,11 @@ class CardController @Inject()(configuration: Configuration, cardService: CardSe
           val filename = picture.filename
           val contentType = picture.contentType
           val uuid = identity.loginInfo.providerKey
-          val pictureFolderURI = absPathToSave + s"$uuid/$cardName/"
+          val pictureFolderURI = absPathToSave + s"$uuid/$cardID/"
           val pictureURI = pictureFolderURI + filename
 
 
-          cardService.savePicture(uuid, cardName, filename)
+          cardService.savePicture(uuid, cardID, filename)
             .map{ score =>
               new File(pictureFolderURI).mkdirs()
               picture.ref.moveTo(new File(pictureURI))
@@ -55,12 +55,12 @@ class CardController @Inject()(configuration: Configuration, cardService: CardSe
       }.recover(recoverFromInternalServerError)
     }
 
-  def getPicture(cardName: String, fileName: String): Action[AnyContent] =
+  def getPicture(cardID: String, fileName: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
         val uuid = identity.loginInfo.providerKey
-        val pictureURI = absPathToSave + s"$uuid/$cardName/$fileName"
-        cardService.retrievePicture(uuid, cardName, fileName).map{
+        val pictureURI = absPathToSave + s"$uuid/$cardID/$fileName"
+        cardService.retrievePicture(uuid, cardID, fileName).map{
           case Some(_) => Ok.sendFile(new File(pictureURI))
           case None => NotFound
         }
@@ -72,10 +72,9 @@ class CardController @Inject()(configuration: Configuration, cardService: CardSe
       verifyAuthentication(request) { identity =>
         cardService.retrieveAll(identity.loginInfo.providerKey)
           .map{cards =>
-            cards.flatMap( PictureDataResponse.fromCard )
-          }.map{pictureUploadResponses =>
-          Ok(Json.toJson(pictureUploadResponses))
-        }
+            cards.flatMap( PictureDataResponse.fromCard )}
+          .map{pictureUploadResponses =>
+            Ok(Json.toJson(pictureUploadResponses))}
       }.recover(recoverFromInternalServerError)
     }
 
@@ -84,18 +83,17 @@ class CardController @Inject()(configuration: Configuration, cardService: CardSe
       verifyAuthentication(request) { identity =>
         cardService.computeTotalScore(fbID)
           .map{ score =>
-            Ok(Json.toJson(ScoreResponse(score)))
-          }
+            Ok(Json.toJson(ScoreResponse(score)))}
       }.recover(recoverFromInternalServerError)
     }
 
 
-  def removePicture(cardName: String, fileName: String): Action[AnyContent] =
+  def removePicture(cardID: String, fileName: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
         val uuid = identity.loginInfo.providerKey
-        val pictureURI = absPathToSave + s"$uuid/$cardName/$fileName"
-        cardService.removePicture(uuid, cardName, fileName)
+        val pictureURI = absPathToSave + s"$uuid/$cardID/$fileName"
+        cardService.removePicture(uuid, cardID, fileName)
           .map{ _ =>
             //if(new File(pictureURI).delete()){
             if(new File(pictureURI).exists()) {

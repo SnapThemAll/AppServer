@@ -8,7 +8,7 @@ import play.api.libs.json.{Json, OFormat}
   *
   * @param fbID The unique ID of the user that owns the card.
   */
-case class Card(cardName: String,
+case class Card(cardID: String,
                 fbID: String,
                 pictures: IndexedSeq[Picture] = IndexedSeq.empty
                ) {

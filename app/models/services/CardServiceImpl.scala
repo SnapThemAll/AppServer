@@ -15,18 +15,18 @@ import scala.concurrent.Future
   */
 class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
 
-  override def savePicture(fbID: String, cardName: String, fileName: String): Future[Double] = {
-    cardDAO.savePicture(fbID, cardName, fileName)
+  override def savePicture(fbID: String, cardID: String, fileName: String): Future[Double] = {
+    cardDAO.savePicture(fbID, cardID, fileName)
   }
 
-  override def retrieve(fbID: String, cardName: String): Future[Option[Card]] = {
-    cardDAO.find(fbID, cardName).map{ maybeCard =>
+  override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {
+    cardDAO.find(fbID, cardID).map{ maybeCard =>
       maybeCard.map(_.getNotDeleted).filter(_.pictures.nonEmpty)
     }
   }
 
-  override def retrievePicture(fbID: String, cardName: String, fileName: String): Future[Option[Picture]] = {
-    retrieve(fbID, cardName).map{ maybeCard =>
+  override def retrievePicture(fbID: String, cardID: String, fileName: String): Future[Option[Picture]] = {
+    retrieve(fbID, cardID).map{ maybeCard =>
       maybeCard.flatMap(_.pictures.find(_.fileName == fileName))
     }
   }
@@ -41,13 +41,13 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
     retrieveAll(fbID)
       .map{ cards =>
         cards
-          .groupBy( _.cardName )
+          .groupBy( _.cardID )
           .map{ case(_, cardsByName) => cardsByName.map( _.bestScore ).max }
           .foldLeft(0d)(_ + _)
       }
   }
 
-  override def removePicture(fbID: String, cardName: String, fileName: String): Future[Option[Card]] = {
-    cardDAO.removePicture(fbID, cardName, fileName)
+  override def removePicture(fbID: String, cardID: String, fileName: String): Future[Option[Card]] = {
+    cardDAO.removePicture(fbID, cardID, fileName)
   }
 }

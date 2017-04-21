@@ -21,9 +21,9 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
 
   private[this] def cardColl = mongoDB.collection("card")
 
-  override def find(fbID: String, cardName: String): Future[Option[Card]] =
+  override def find(fbID: String, cardID: String): Future[Option[Card]] =
     cardColl.flatMap(
-      _.find(Json.obj("fbID" -> fbID, "cardName" -> cardName)).one[Card]
+      _.find(Json.obj("fbID" -> fbID, "cardID" -> cardID)).one[Card]
     )
 
   override def findAll(fbID: String): Future[IndexedSeq[Card]] =
@@ -35,38 +35,38 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
 
   override def save(card: Card): Future[Card] =
     cardColl
-      .flatMap(_.update(Json.obj("fbID" -> card.fbID, "cardName" -> card.cardName), card, upsert = true))
+      .flatMap(_.update(Json.obj("fbID" -> card.fbID, "cardID" -> card.cardID), card, upsert = true))
       .transform(
         _ => card,
         t => t
       )
-  override def savePicture(fbID: String, cardName: String, fileName: String): Future[Double] = {
-    find(fbID, cardName)
+  override def savePicture(fbID: String, cardID: String, fileName: String): Future[Double] = {
+    find(fbID, cardID)
       .map{ cardAlreadyStored =>
-        save(cardAlreadyStored.getOrElse(Card(cardName, fbID)).addPic(fileName, Random.nextDouble() * 10))
+        save(cardAlreadyStored.getOrElse(Card(cardID, fbID)).addPic(fileName, Random.nextDouble() * 10))
       }
       .flatMap{ cardSaved =>
         cardSaved.map(_.pictures.last.score)
       }
   }
 
-  override def remove(fbID: String, cardName: String): Future[Unit] =
+  override def remove(fbID: String, cardID: String): Future[Unit] =
     cardColl
-      .flatMap(_.remove(Json.obj("fbID" -> fbID, "cardName" -> cardName)))
+      .flatMap(_.remove(Json.obj("fbID" -> fbID, "cardID" -> cardID)))
       .transform(
         _ => (),
         t => t
       )
 
 
-  override def removePicture(fbID: String, cardName: String, fileName: String): Future[Option[Card]] = {
-    find(fbID, cardName)
+  override def removePicture(fbID: String, cardID: String, fileName: String): Future[Option[Card]] = {
+    find(fbID, cardID)
       .map{cardAlreadyStored =>
         if(cardAlreadyStored.isEmpty || !cardAlreadyStored.get.getNotDeleted.pictures.exists(_.fileName == fileName)){
           Future.successful(None)
           }
         /*else if (cardAlreadyStored.get.pictures.length == 1 && cardAlreadyStored.get.pictures.head.fileName == fileName) {
-           remove(fbID, cardName).map(_ => None)
+           remove(fbID, cardID).map(_ => None)
         } */
         else {
           val cardToStore = cardAlreadyStored.get.removePic(fileName)

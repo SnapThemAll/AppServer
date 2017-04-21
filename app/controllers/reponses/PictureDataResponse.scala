@@ -4,17 +4,17 @@ import models.{Card, Picture}
 import play.api.libs.json.{Json, OFormat}
 
 
-case class PictureDataResponse(cardName: String, fileName: String, score: Double)
+case class PictureDataResponse(cardID: String, fileName: String, score: Double)
 
 object PictureDataResponse{
 
   def fromCard(card: Card): IndexedSeq[PictureDataResponse] =
-    fromPictures(card.cardName, card.pictures)
+    fromPictures(card.cardID, card.pictures)
 
-  def fromPictures(cardName: String, pictures: IndexedSeq[Picture]): IndexedSeq[PictureDataResponse] =
+  def fromPictures(cardID: String, pictures: IndexedSeq[Picture]): IndexedSeq[PictureDataResponse] =
     pictures.filterNot(_.deleted).map{ pic =>
       PictureDataResponse(
-        cardName,
+        cardID,
         pic.fileName,
         pic.score
       )}

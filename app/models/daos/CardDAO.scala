@@ -8,14 +8,14 @@ trait CardDAO {
 
   def save(card: Card): Future[Card]
 
-  def savePicture(fbID: String, cardName: String, fileName: String): Future[Double]
+  def savePicture(fbID: String, cardID: String, fileName: String): Future[Double]
 
-  def find(fbID: String, cardName: String): Future[Option[Card]]
+  def find(fbID: String, cardID: String): Future[Option[Card]]
 
   def findAll(fbID: String): Future[IndexedSeq[Card]]
 
-  def remove(fbID: String, cardName: String): Future[Unit]
+  def remove(fbID: String, cardID: String): Future[Unit]
 
-  def removePicture(fbID: String, cardName: String, fileName: String): Future[Option[Card]]
+  def removePicture(fbID: String, cardID: String, fileName: String): Future[Option[Card]]
 
 }

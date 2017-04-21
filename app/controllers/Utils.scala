@@ -20,7 +20,7 @@ object Utils extends Logger {
   }
 
   def recoverWhenRetrievingPicture = {
-    val notFound = NotFound("Picture not found. Verify 'cardName' and 'fileName'")
+    val notFound = NotFound("Picture not found. Verify 'cardID' and 'fileName'")
     PartialFunction[Throwable, Result] {
       case _: NoSuchElementException => notFound
       case _: IllegalAccessException => notFound

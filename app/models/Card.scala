@@ -1,6 +1,7 @@
 package models
 
-import controllers.reponses.PictureDataResponse
+import computing.Category
+import computing.PictureFingerPrint
 import play.api.libs.json.{Json, OFormat}
 
 /**
@@ -24,6 +25,8 @@ case class Card(cardID: String,
 
   def getNotDeleted: Card =
     this.copy(pictures = pictures.filterNot(_.deleted))
+
+  def toCategory: Category = Category(cardID, getNotDeleted.pictures.map(p => PictureFingerPrint(p)).toSet)
 }
 object Card {
 

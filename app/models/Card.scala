@@ -1,5 +1,6 @@
 package models
 
+import utils.Variables
 import computing.Category
 import computing.PictureFingerPrint
 import play.api.libs.json.{Json, OFormat}
@@ -26,7 +27,10 @@ case class Card(cardID: String,
   def getNotDeleted: Card =
     this.copy(pictures = pictures.filterNot(_.deleted))
 
-  def toCategory: Category = Category(cardID, getNotDeleted.pictures.map(p => PictureFingerPrint(p)).toSet)
+  def pictureFileNames: IndexedSeq[String] =
+    pictures.map(pic => Variables.absolutePathToData + s"$fbID/$cardID/${pic.fileName}")
+
+  def toCategory: Category = Category(cardID, getNotDeleted.pictureFileNames.map(PictureFingerPrint.fromImage).toSet)
 }
 object Card {
 

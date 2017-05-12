@@ -4,17 +4,17 @@ import java.io.File
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
-import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{Action, AnyContent, Controller}
+import utils.Variables
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
-class GameController @Inject()(configuration: Configuration, silhouette: Silhouette[DefaultEnv]) extends Controller {
+class GameController @Inject()(silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
-  val absPathToSave: String = configuration.getString("my.data.path").getOrElse("/tmp/")
+  val absPathToSave: String = Variables.absolutePathToData
 
   def getLevels: Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>

@@ -12,14 +12,14 @@ import play.api.mvc.Results._
 object Utils extends Logger {
 
   def verifyAuthentication[T](request: => UserAwareRequest[DefaultEnv, T])(
-      whatToDo: => (DefaultEnv#I => Future[Result])) = {
+      whatToDo: => (DefaultEnv#I => Future[Result])): Future[Result] = {
     request.identity match {
       case Some(identity) => whatToDo(identity)
       case None           => Future.successful(Unauthorized("Unauthorized access. Please sign-in first."))
     }
   }
 
-  def recoverWhenRetrievingPicture = {
+  def recoverWhenRetrievingPicture: PartialFunction[Throwable, Result] = {
     val notFound = NotFound("Picture not found. Verify 'cardID' and 'fileName'")
     PartialFunction[Throwable, Result] {
       case _: NoSuchElementException => notFound
@@ -27,7 +27,7 @@ object Utils extends Logger {
     } orElse recoverFromInternalServerError
   }
 
-  def recoverFromInternalServerError =
+  def recoverFromInternalServerError: PartialFunction[Throwable, Result] =
     PartialFunction[Throwable, Result] { t =>
       logger.error("Error while answering a request", t)
       InternalServerError("An internal server error occurred. We are working on it.")

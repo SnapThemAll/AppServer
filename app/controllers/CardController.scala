@@ -6,11 +6,11 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.reponses.{PictureDataResponse, PictureUploadResponse, ScoreResponse}
 import models.services.CardService
-import play.api.Configuration
 import play.api.libs.Files
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
+import utils.Variables
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -21,10 +21,10 @@ import scala.concurrent.Future
   *
   * Check conf.routes to see what URL to use for your requests
   */
-class CardController @Inject()(configuration: Configuration, cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
+class CardController @Inject()(cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
-  val absPathToSave: String = configuration.getString("my.data.path").getOrElse("/tmp/")
+  val absPathToSave: String = Variables.absolutePathToData
 
   def uploadPicture(cardID: String): Action[MultipartFormData[Files.TemporaryFile]] =
     silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
@@ -32,7 +32,6 @@ class CardController @Inject()(configuration: Configuration, cardService: CardSe
 
       verifyAuthentication(request) { identity =>
         request.body.file("picture").map { picture =>
-          import java.io.File
           val filename = picture.filename
           val contentType = picture.contentType
           val uuid = identity.loginInfo.providerKey

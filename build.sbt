@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test",
   "net.codingwell"         %% "scala-guice" % "4.1.0",
   "com.iheart"             %% "ficus" % "1.3.0", //lightweight companion to Typesafe config that makes it more Scala-friendly
+
   //Silhouette
   "com.mohiva"        %% "play-silhouette"                 % "4.0.0",
   "com.mohiva"        %% "play-silhouette-password-bcrypt" % "4.0.0",
@@ -27,16 +28,18 @@ libraryDependencies ++= Seq(
   "com.mohiva"        %% "play-silhouette-persistence"     % "4.0.0",
   "com.mohiva"        %% "play-silhouette-testkit"         % "4.0.0" % "test",
   "org.reactivemongo" %% "play2-reactivemongo"             % "0.12.1",
+
   //breeze
   "org.scalanlp" %% "breeze"         % "0.12",
   "org.scalanlp" %% "breeze-natives" % "0.12",
   "org.scalanlp" %% "breeze-viz" % "0.12",
 
-  "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-  "com.github.fommil.netlib" % "all" % "1.1.2" pomOnly(),
-
   //JavaCV (OpenCV)
-  "org.bytedeco" % "sbt-javacv" % "1.14"
+  "org.bytedeco" % "sbt-javacv" % "1.14",
+
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
+  "com.github.fommil.netlib" % "all" % "1.1.2" pomOnly()
+
 )
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")

@@ -30,7 +30,7 @@ case class Card(cardID: String,
   def pictureFileNames: IndexedSeq[String] =
     pictures.map(pic => Variables.absolutePathToData + s"$fbID/$cardID/${pic.fileName}")
 
-  def toCategory: Category = Category(cardID, getNotDeleted.pictureFileNames.map(PictureFingerPrint.fromImage).toSet)
+  def toCategory: Category = Category(cardID, getNotDeleted.pictureFileNames.map(PictureFingerPrint.fromImagePath).toSet)
 }
 object Card {
 

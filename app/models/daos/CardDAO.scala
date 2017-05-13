@@ -8,7 +8,7 @@ trait CardDAO {
 
   def save(card: Card): Future[Card]
 
-  def savePicture(fbID: String, cardID: String, fileName: String): Future[Double]
+  def savePicture(fbID: String, cardID: String, fileName: String, score: Double): Future[Card]
 
   def find(fbID: String, cardID: String): Future[Option[Card]]
 

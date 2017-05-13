@@ -2,6 +2,7 @@ package models.services
 
 import javax.inject.Inject
 
+import computing.ScoreComputing
 import models.{Card, Picture}
 import models.daos.CardDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -16,7 +17,13 @@ import scala.concurrent.Future
 class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
 
   override def savePicture(fbID: String, cardID: String, fileName: String): Future[Double] = {
-    cardDAO.savePicture(fbID, cardID, fileName)
+      cardDAO.findAll(fbID)
+        .flatMap{ cards =>
+          val userSet = cards.map(_.toCategory).toSet
+          val score = ScoreComputing.computeScore(userSet)
+          cardDAO.savePicture(fbID, cardID, fileName, score)
+        }
+        .map(_.pictures.last.score)
   }
 
   override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {
@@ -40,10 +47,7 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
   override def computeTotalScore(fbID: String): Future[Double] = {
     retrieveAll(fbID)
       .map{ cards =>
-        cards
-          .groupBy( _.cardID )
-          .map{ case(_, cardsByName) => cardsByName.map( _.bestScore ).max }
-          .foldLeft(0d)(_ + _)
+        cards.map(_.bestScore).sum
       }
   }
 

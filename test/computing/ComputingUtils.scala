@@ -7,7 +7,8 @@ object ComputingUtils {
 
   lazy val validationSet: Set[Category] = dataSetFromFolder("data/validation/")
 
-  lazy val userSet = dataSetFromFolder("data/user/")
+  lazy val userSet: Set[Category] = dataSetFromFolder("data/user/")
+  lazy val userClutterSet: Set[Category] = dataSetFromFolder("data/userClutter/")
 
   def getListOfFileNames(dir: String): List[String] = {
     getListOfFiles(dir).filter(_.isFile).map(_.getName)
@@ -20,7 +21,7 @@ object ComputingUtils {
     getListOfFolderNames(dir)
       .map{folderName =>
         val dataSet = getListOfFileNames(dir + folderName)
-          .map(PictureFingerPrint.fromImagePath)
+          .map(fileName => PictureFingerPrint.fromImagePath(dir + folderName + "/" + fileName))
           .toSet
         Category(folderName, dataSet)
       }.toSet

@@ -18,7 +18,10 @@ object PictureFingerPrint {
   def fromDescriptor(descriptor: Mat): PictureFingerPrint =
     PictureFingerPrint(descriptor.rows, descriptor.cols, descriptor.`type`, matToIndexedSeq(descriptor))
 
-  def fromImagePath(imagePath: String): PictureFingerPrint = fromDescriptor(computeDescriptor(imagePath))
+  def fromImagePath(imagePath: String): PictureFingerPrint = {
+    //println(imagePath)
+    fromDescriptor(computeDescriptor(imagePath))
+  }
 
   def fromPicture(picture: Picture): PictureFingerPrint = fromImagePath(picture.fileName)
 }

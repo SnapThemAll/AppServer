@@ -6,9 +6,9 @@ object ScoreComputing {
     ???
   }
 
-  private def w(picA: PictureFingerPrint, picB: PictureFingerPrint): Double = picA.distanceWith(picB)
+  def w(picA: PictureFingerPrint, picB: PictureFingerPrint): Double = picA.distanceWith(picB)
 
-  private def fNN(userSet: Set[Category], validationSet: Set[Category]): Double = {
+  def fNN(userSet: Set[Category], validationSet: Set[Category]): Double = {
     require(userSet.size == validationSet.size,
       s"userSet size = ${userSet.size}, validationSet size = ${validationSet.size}. " +
         s"This means that they don't contain the same categories")

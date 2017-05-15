@@ -7,7 +7,7 @@ import utils.Files.ls
 
 object EnvironmentVariables {
 
-  val absolutePathToData: String = "data/"
+  val absolutePathToData: String = "/home/snap/data/"
 
   lazy val validationSet: Set[Category] = dataSetFromFolder(absolutePathToData + "validation")
 

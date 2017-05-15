@@ -16,7 +16,8 @@ object ScoreComputing {
       if(cat.name == newPictureCategoryName) cat.addPictureFP(newPictureFP) else cat
     }
     val newFNN = fNN(newUserSet, validationSet)
-    println("newFNN - oldFNN = " + newFNN - oldFNN)
+    println("Category Name : " + newPictureCategoryName)
+    println("fNN improvements = " + (newFNN - oldFNN))
     if(newFNN < oldFNN){
       5 + Random.nextDouble() * 5
     } else {

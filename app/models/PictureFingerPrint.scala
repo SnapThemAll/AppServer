@@ -21,7 +21,7 @@ object PictureFingerPrint {
     PictureFingerPrint(descriptor.rows, descriptor.cols, descriptor.`type`, matToIndexedSeq(descriptor))
 
   def fromImageFile(imageFile: File): PictureFingerPrint = {
-    println("Computing FP for :" + imageFile.getAbsolutePath)
+    //println("Computing FP for :" + imageFile.getAbsolutePath)
     fromDescriptor(computeDescriptor(imageFile))
   }
 

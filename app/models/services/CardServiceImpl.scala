@@ -2,10 +2,11 @@ package models.services
 
 import javax.inject.Inject
 
-import computing.ScoreComputing
-import models.{Card, Picture}
+import computing.{Category, ScoreComputing}
+import models.{Card, Picture, PictureFingerPrint}
 import models.daos.CardDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import utils.EnvironmentVariables
 
 import scala.concurrent.Future
 
@@ -17,13 +18,15 @@ import scala.concurrent.Future
 class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
 
   override def savePicture(fbID: String, cardID: String, fileName: String): Future[Double] = {
-      cardDAO.findAll(fbID)
-        .flatMap{ cards =>
-          val userSet = cards.map(_.toCategory).toSet
-          val score = ScoreComputing.computeScore(userSet)
-          cardDAO.savePicture(fbID, cardID, fileName, score)
-        }
-        .map(_.pictures.last.score)
+    val newPicturePath = EnvironmentVariables.pathToImage(fbID, cardID, fileName)
+    val newPictureFP = PictureFingerPrint.fromImagePath(newPicturePath)
+    cardDAO.findAll(fbID)
+      .flatMap{ cards =>
+        val userSet = cards.map(Category.fromCard).toSet
+        val score = ScoreComputing.computeScore(newPictureFP, cardID, userSet)
+        cardDAO.savePicture(fbID, cardID, fileName, score)
+      }
+      .map(_.pictures.last.score)
   }
 
   override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {

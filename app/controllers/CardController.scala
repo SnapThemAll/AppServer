@@ -10,21 +10,19 @@ import play.api.libs.Files
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
-import utils.Variables
+import utils.EnvironmentVariables
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
 /**
-  * Class that handles the request related to a track
-  * (save, get, getAll, getPredicted, getAnalysis, remove)
+  * Class that handles the request related to a card
   *
   * Check conf.routes to see what URL to use for your requests
   */
 class CardController @Inject()(cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
-  val absPathToSave: String = Variables.absolutePathToData
 
   def uploadPicture(cardID: String): Action[MultipartFormData[Files.TemporaryFile]] =
     silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
@@ -35,15 +33,14 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
           val filename = picture.filename
           val contentType = picture.contentType
           val uuid = identity.loginInfo.providerKey
-          val pictureFolderURI = absPathToSave + s"$uuid/$cardID/"
+          val pictureFolderURI = EnvironmentVariables.pathToFolder(uuid, cardID)
           val pictureURI = pictureFolderURI + filename
 
+          new File(pictureFolderURI).mkdirs()
+          picture.ref.moveTo(new File(pictureURI))
 
           cardService.savePicture(uuid, cardID, filename)
             .map{ score =>
-              new File(pictureFolderURI).mkdirs()
-              picture.ref.moveTo(new File(pictureURI))
-
               Ok(Json.toJson(PictureUploadResponse(score)))
             }
         }.getOrElse{
@@ -58,7 +55,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
         val uuid = identity.loginInfo.providerKey
-        val pictureURI = absPathToSave + s"$uuid/$cardID/$fileName"
+        val pictureURI = EnvironmentVariables.pathToImage(uuid, cardID, fileName)
         cardService.retrievePicture(uuid, cardID, fileName).map{
           case Some(_) => Ok.sendFile(new File(pictureURI))
           case None => NotFound
@@ -91,7 +88,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
         val uuid = identity.loginInfo.providerKey
-        val pictureURI = absPathToSave + s"$uuid/$cardID/$fileName"
+        val pictureURI = EnvironmentVariables.pathToImage(uuid, cardID, fileName)
         cardService.removePicture(uuid, cardID, fileName)
           .map{ _ =>
             //if(new File(pictureURI).delete()){

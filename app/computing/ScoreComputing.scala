@@ -1,9 +1,26 @@
 package computing
 
+import models.{Picture, PictureFingerPrint}
+import utils.{EnvironmentVariables, Files}
+
+import scala.util.Random
+
 object ScoreComputing {
 
-  def computeScore(userSet: Set[Category]) : Double = {
-    ???
+  import utils.EnvironmentVariables.validationSet
+
+  def computeScore(newPictureFP: PictureFingerPrint, newPictureCategoryName: String, userSet: Set[Category]) : Double = {
+    val userSetFilled = fillSetWithClutter(userSet, validationSet.map(_.name))
+    val oldFNN = fNN(userSetFilled, validationSet)
+    val newUserSet = userSetFilled.map{ cat =>
+      if(cat.name == newPictureCategoryName) cat.addPictureFP(newPictureFP) else cat
+    }
+    val newFNN = fNN(newUserSet, validationSet)
+    if(newFNN < oldFNN){
+      5 + Random.nextDouble() * 5
+    } else {
+      Random.nextDouble() * 5
+    }
   }
 
   def w(picA: PictureFingerPrint, picB: PictureFingerPrint): Double = picA.distanceWith(picB)
@@ -28,4 +45,17 @@ object ScoreComputing {
     }.sum
   }
 
+
+  private def randomClutter: PictureFingerPrint = {
+    val clutterImages = Files.ls(EnvironmentVariables.absolutePathToData + "clutter")
+    val randomClutter = clutterImages(Random.nextInt(clutterImages.size))
+    PictureFingerPrint.fromImageFile(randomClutter)
+  }
+
+  private def fillSetWithClutter(set: Set[Category], categories: Set[String]): Set[Category] = {
+    val setCatNames = set.map(_.name)
+    categories.map{ catName =>
+      set.find(cat => cat.name == catName).getOrElse(Category(catName, Set(randomClutter)))
+    }
+  }
 }

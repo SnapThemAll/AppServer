@@ -1,9 +1,8 @@
 package models
 
-import utils.Variables
 import computing.Category
-import computing.PictureFingerPrint
 import play.api.libs.json.{Json, OFormat}
+import utils.EnvironmentVariables
 
 /**
   * The Card object.
@@ -15,9 +14,15 @@ case class Card(cardID: String,
                 pictures: IndexedSeq[Picture] = IndexedSeq.empty
                ) {
 
+  private def picturePath(fileName: String): String = EnvironmentVariables.pathToImage(fbID, cardID, fileName)
+
   def bestScore: Double = pictures.map(_.score).max
-  def addPic(fileName: String, score: Double): Card =
-    this.copy(pictures = pictures.filter(_.fileName != fileName) :+ Picture(fileName, score))
+
+  def updatePicture(fileName: String, score: Double): Card = {
+    val fingerPrint = PictureFingerPrint.fromImagePath(picturePath(fileName))
+    this.copy(pictures = pictures.filter(_.fileName != fileName) :+ Picture(fileName, score, fingerPrint))
+  }
+
   def removePic(fileName: String): Card =
     this.copy(pictures = pictures.map{ picture =>
       if(picture.fileName == fileName) picture.delete
@@ -28,9 +33,8 @@ case class Card(cardID: String,
     this.copy(pictures = pictures.filterNot(_.deleted))
 
   def pictureFileNames: IndexedSeq[String] =
-    pictures.map(pic => Variables.absolutePathToData + s"$fbID/$cardID/${pic.fileName}")
+    pictures.map(pic => EnvironmentVariables.pathToImage(fbID, cardID, pic.fileName))
 
-  def toCategory: Category = Category(cardID, getNotDeleted.pictureFileNames.map(PictureFingerPrint.fromImagePath).toSet)
 }
 object Card {
 

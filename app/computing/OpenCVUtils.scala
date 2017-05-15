@@ -10,6 +10,20 @@ import org.bytedeco.javacpp.opencv_imgcodecs.{IMREAD_COLOR, imread}
 
 object OpenCVUtils {
 
+  def computeDescriptor(file: File): Mat = {
+    computeDescriptor(loadOrExit(file))
+  }
+
+  def distance(descriptor1: Mat, descriptor2: Mat, numberToSelect: Int = 15): Float = {
+    // Create feature matcher
+    val matcher = new BFMatcher(NORM_HAMMING, false)
+    val matches = new DMatchVector()
+    matcher.`match`(descriptor1, descriptor2, matches)
+
+    //compute distance over the best n matches
+    distanceOfBestMatches(matches, numberToSelect)
+  }
+
   def buildDescriptor(rows: Int, cols: Int, `type`: Int, data: IndexedSeq[Int]): Mat = {
     require(data.length == rows * cols, "Matrix length should equal rows * cols")
     require(`type` == 0, "Matrix element type should be CV_8U")
@@ -35,20 +49,6 @@ object OpenCVUtils {
     for (i <- 0 until size) yield indexer.get(0, 0, i)
   }
 
-  def computeDescriptor(imageFileName: String): Mat = {
-    computeDescriptor(new File(imageFileName))
-  }
-
-  def distance(descriptor1: Mat, descriptor2: Mat, numberToSelect: Int = 15): Float = {
-    // Create feature matcher
-    val matcher = new BFMatcher(NORM_HAMMING, false)
-    val matches = new DMatchVector()
-    matcher.`match`(descriptor1, descriptor2, matches)
-
-    //compute distance over the best n matches
-    distanceOfBestMatches(matches, numberToSelect)
-  }
-
   private def loadOrExit(file: File, flags: Int = IMREAD_COLOR): Mat = {
     // Read input image
     val image = imread(file.getAbsolutePath, flags)
@@ -57,10 +57,6 @@ object OpenCVUtils {
       sys.exit(1)
     }
     image
-  }
-
-  private def computeDescriptor(file: File): Mat = {
-    computeDescriptor(loadOrExit(file))
   }
 
   private def computeDescriptor(imageMat: Mat): Mat = {

@@ -43,7 +43,7 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
   override def savePicture(fbID: String, cardID: String, fileName: String, score: Double): Future[Card] = {
     find(fbID, cardID)
       .flatMap{ cardAlreadyStored =>
-        save(cardAlreadyStored.getOrElse(Card(cardID, fbID)).addPic(fileName, score))
+        save(cardAlreadyStored.getOrElse(Card(cardID, fbID)).updatePicture(fileName, score))
       }
   }
 

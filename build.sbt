@@ -35,12 +35,13 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze-viz" % "0.12",
 
   //JavaCV (OpenCV)
-  "org.bytedeco" % "javacv-platform" % "1.3.2",
+  //"org.bytedeco" % "javacv-platform" % "1.3.2",
 
   "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
   "com.github.fommil.netlib" % "all" % "1.1.2" pomOnly()
 
 )
+
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 

@@ -33,6 +33,13 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
         .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAll in card dao"))
     ).map(_.toIndexedSeq)
 
+  override def all: Future[IndexedSeq[Card]] =
+    cardColl.flatMap(
+      _.find(Json.obj())
+        .cursor[Card]()
+        .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("all in card dao"))
+    ).map(_.toIndexedSeq)
+
   override def save(card: Card): Future[Card] =
     cardColl
       .flatMap(_.update(Json.obj("fbID" -> card.fbID, "cardID" -> card.cardID), card, upsert = true))

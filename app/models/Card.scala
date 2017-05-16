@@ -20,7 +20,9 @@ case class Card(cardID: String,
 
   def updatePicture(fileName: String, score: Double): Card = {
     val fingerPrint = PictureFingerPrint.fromImagePath(picturePath(fileName))
-    this.copy(pictures = pictures.filter(_.fileName != fileName) :+ Picture(fileName, score, fingerPrint))
+    this.copy(
+      pictures = pictures.filter(_.fileName != fileName) :+ Picture(fileName, score, fingerPrint)
+    )
   }
 
   def removePic(fileName: String): Card =
@@ -37,7 +39,6 @@ case class Card(cardID: String,
 
 }
 object Card {
-
   /**
     * An implicit writer to export a card to JSON. Import this in your scope to use Json.toJson on a card object.
     */

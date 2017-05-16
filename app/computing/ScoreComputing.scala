@@ -22,11 +22,13 @@ object ScoreComputing {
     println(s"Category $newPictureCategoryName improved by $dif} " +
       s"(the bigger the better because oldFNN - newFNN) (newFNN = $newFNN)")
     if( dif > 1000){
-      randomScore(5, 10)
+      randomScore(7, 10)
     } else if (dif > 500) {
-      randomScore(0, 5)
+      randomScore(4, 7)
+    } else if (dif > 0) {
+      randomScore(1, 4)
     } else {
-      0d
+      randomScore(0, 1)
     }
   }
 

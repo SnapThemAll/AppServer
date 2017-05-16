@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.reponses.{PictureDataResponse, PictureUploadResponse, ScoreResponse}
+import models.PictureFingerPrint
 import models.services.CardService
 import play.api.libs.Files
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -30,22 +31,31 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
 
       verifyAuthentication(request) { identity =>
         request.body.file("picture").map { picture =>
-          val filename = picture.filename
+          val fileName = picture.filename
           val contentType = picture.contentType
           val uuid = identity.loginInfo.providerKey
           val pictureFolderURI = EnvironmentVariables.pathToFolder(uuid, cardID)
-          val pictureURI = pictureFolderURI + filename
+          val pictureURI = pictureFolderURI + fileName
 
           new File(pictureFolderURI).mkdirs()
           picture.ref.moveTo(new File(pictureURI))
 
-          cardService.savePicture(uuid, cardID, filename)
-            .map{ score =>
-              Ok(Json.toJson(PictureUploadResponse(score)))
-            }
+          val fingerPrint = PictureFingerPrint.fromImagePath(pictureURI)
+
+          if(fingerPrint.rows < 200) {
+            Future.successful(
+              UnprocessableEntity("Quality of the image is too low")
+            )
+          } else {
+            cardService.savePicture(uuid, cardID, fileName, fingerPrint)
+              .map{ score =>
+                Ok(Json.toJson(PictureUploadResponse(score)))
+              }
+          }
+
         }.getOrElse{
           Future.successful(
-            UnprocessableEntity("Could not upload file")
+            UnprocessableEntity("No picture file found in the request")
           )
         }
       }.recover(recoverFromInternalServerError)

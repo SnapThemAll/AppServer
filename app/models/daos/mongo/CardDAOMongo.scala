@@ -2,7 +2,7 @@ package models.daos.mongo
 
 
 import com.google.inject.Inject
-import models.{Card, Picture}
+import models.{Card, Picture, PictureFingerPrint}
 import models.daos.CardDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{Json, OFormat}
@@ -47,10 +47,10 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
         _ => card,
         t => t
       )
-  override def savePicture(fbID: String, cardID: String, fileName: String, score: Double): Future[Card] = {
+  override def savePicture(fbID: String, cardID: String, picture: Picture): Future[Card] = {
     find(fbID, cardID)
       .flatMap{ cardAlreadyStored =>
-        save(cardAlreadyStored.getOrElse(Card(cardID, fbID)).updatePicture(fileName, score))
+        save(cardAlreadyStored.getOrElse(Card(cardID, fbID)).updatePicture(picture))
       }
   }
 

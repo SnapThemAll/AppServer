@@ -18,12 +18,10 @@ case class Card(cardID: String,
 
   def bestScore: Double = pictures.map(_.score).max
 
-  def updatePicture(fileName: String, score: Double): Card = {
-    val fingerPrint = PictureFingerPrint.fromImagePath(picturePath(fileName))
+  def updatePicture(picture: Picture): Card =
     this.copy(
-      pictures = pictures.filter(_.fileName != fileName) :+ Picture(fileName, score, fingerPrint)
+      pictures = pictures.filter(_.fileName != picture.fileName) :+ picture
     )
-  }
 
   def removePic(fileName: String): Card =
     this.copy(pictures = pictures.map{ picture =>

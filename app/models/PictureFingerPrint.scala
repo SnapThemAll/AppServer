@@ -9,6 +9,7 @@ import play.api.libs.json.{Json, OFormat}
 case class PictureFingerPrint(rows: Int, cols: Int, `type`: Int, data: IndexedSeq[Int]) {
   require(data.length == rows * cols, "Matrix length should equal rows * cols")
   require(`type` == 0, "Matrix element type should be CV_8U")
+  require(cols == 32, "Feature elements should have dimension of 32")
 
   private lazy val descriptor : Mat = buildDescriptor(rows, cols, `type`, data)
 

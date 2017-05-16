@@ -24,6 +24,7 @@ import scala.concurrent.Future
 class CardController @Inject()(cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
+  import computing.OpenCVUtils.computeDescriptor
 
   def uploadPicture(cardID: String): Action[MultipartFormData[Files.TemporaryFile]] =
     silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
@@ -35,18 +36,19 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
           val contentType = picture.contentType
           val uuid = identity.loginInfo.providerKey
           val pictureFolderURI = EnvironmentVariables.pathToFolder(uuid, cardID)
-          val pictureURI = pictureFolderURI + fileName
+          val pictureFile = new File(pictureFolderURI + fileName)
 
           new File(pictureFolderURI).mkdirs()
-          picture.ref.moveTo(new File(pictureURI))
+          picture.ref.moveTo(pictureFile)
 
-          val fingerPrint = PictureFingerPrint.fromImagePath(pictureURI)
+          val descriptor = computeDescriptor(pictureFile)
 
-          if(fingerPrint.rows < 200) {
+          if(descriptor.rows < 200) {
             Future.successful(
               UnprocessableEntity("Quality of the image is too low")
             )
           } else {
+            val fingerPrint = PictureFingerPrint.fromDescriptor(descriptor)
             cardService.savePicture(uuid, cardID, fileName, fingerPrint)
               .map{ score =>
                 Ok(Json.toJson(PictureUploadResponse(score)))

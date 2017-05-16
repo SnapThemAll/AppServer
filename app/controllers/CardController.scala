@@ -35,15 +35,13 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
           val fileName = picture.filename
           val contentType = picture.contentType
           val uuid = identity.loginInfo.providerKey
-          val pictureFolderURI = EnvironmentVariables.pathToFolder(uuid, cardID)
-          val pictureFile = new File(pictureFolderURI + fileName)
 
-          new File(pictureFolderURI).mkdirs()
-          picture.ref.moveTo(pictureFile)
+          val tmpFile = picture.ref.file
 
-          val descriptor = computeDescriptor(pictureFile)
+          val descriptor = computeDescriptor(tmpFile)
 
           if(descriptor.rows < 200) {
+            println("Unprocessable entity: Quality of the image is too low")
             Future.successful(
               UnprocessableEntity("Quality of the image is too low")
             )
@@ -51,11 +49,16 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
             val fingerPrint = PictureFingerPrint.fromDescriptor(descriptor)
             cardService.savePicture(uuid, cardID, fileName, fingerPrint)
               .map{ score =>
+                val pictureFolderURI = EnvironmentVariables.pathToFolder(uuid, cardID)
+                val pictureFile = new File(pictureFolderURI + fileName)
+                new File(pictureFolderURI).mkdirs()
+                picture.ref.moveTo(pictureFile)
                 Ok(Json.toJson(PictureUploadResponse(score)))
               }
           }
 
         }.getOrElse{
+          println("Unprocessable entity: No picture file found in the request")
           Future.successful(
             UnprocessableEntity("No picture file found in the request")
           )

@@ -14,6 +14,8 @@ trait CardDAO {
 
   def findAll(fbID: String): Future[IndexedSeq[Card]]
 
+  def all: Future[IndexedSeq[Card]]
+
   def remove(fbID: String, cardID: String): Future[Unit]
 
   def removePicture(fbID: String, cardID: String, fileName: String): Future[Option[Card]]

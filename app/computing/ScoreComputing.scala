@@ -11,19 +11,25 @@ object ScoreComputing {
 
   def computeScore(newPictureFP: PictureFingerPrint, newPictureCategoryName: String, userSet: Set[Category]) : Double = {
     val userSetFilled = fillSetWithClutter(userSet, validationSet.map(_.name))
-    val oldFNN = fNN(userSetFilled, validationSet)
     val newUserSet = userSetFilled.map{ cat =>
       if(cat.name == newPictureCategoryName) cat.addPictureFP(newPictureFP) else cat
     }
+
+    val oldFNN = fNN(userSetFilled, validationSet)
     val newFNN = fNN(newUserSet, validationSet)
-    println("Category Name : " + newPictureCategoryName)
-    println("fNN improvements = " + (newFNN - oldFNN))
-    if(newFNN < oldFNN){
-      5 + Random.nextDouble() * 5
+
+    val dif = oldFNN - newFNN
+    println(s"Category $newPictureCategoryName improved by $dif} " +
+      s"(the bigger the better because oldFNN - newFNN) (newFNN = $newFNN)")
+    if( dif > 1000){
+      randomScore(5, 10)
+    } else if (dif > 500) {
+      randomScore(0, 5)
     } else {
-      Random.nextDouble() * 5
+      0d
     }
   }
+
 
   def w(picA: PictureFingerPrint, picB: PictureFingerPrint): Double = picA.distanceWith(picB)
 
@@ -47,6 +53,7 @@ object ScoreComputing {
     }.sum
   }
 
+  private def randomScore(from: Int, to: Int): Double = from + Random.nextDouble() * (to - from)
 
   private def randomClutter: PictureFingerPrint = {
     val clutterImages = Files.ls(EnvironmentVariables.absolutePathToData + "clutter")

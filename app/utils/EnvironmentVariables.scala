@@ -9,12 +9,12 @@ object EnvironmentVariables {
 
   val absolutePathToData: String = "/home/snap/data/"
 
-  lazy val validationSet: Set[Category] = dataSetFromFolder(absolutePathToData + "validation")
+  val validationSet: Set[Category] = dataSetFromFolder(absolutePathToData + "validation")
 
   def pathToFolder(fbID: String, cardID: String): String =
-    absolutePathToData + s"$fbID/$cardID/"
+    absolutePathToData + s"users/$fbID/$cardID/"
   def pathToImage(fbID: String, cardID: String, fileName: String): String =
-    absolutePathToData + s"$fbID/$cardID/$fileName"
+    absolutePathToData + s"users/$fbID/$cardID/$fileName"
 
   private def dataSetFromFolder(dir: String): Set[Category] = {
     (for {

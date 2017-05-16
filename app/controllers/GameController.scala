@@ -14,15 +14,14 @@ import scala.concurrent.Future
 class GameController @Inject()(silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
-  val absPathToSave: String = EnvironmentVariables.absolutePathToData
+  val pathToFile: String = EnvironmentVariables.absolutePathToData + "levels.json"
 
   def getLevels: Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
-        val pathToFile = absPathToSave + "levels.json"
         val file = new File(pathToFile)
         if (file.exists()) {
-          Future.successful(Ok.sendFile(new File(absPathToSave)))
+          Future.successful(Ok.sendFile(file))
         } else {
           Future.successful(NotFound)
         }

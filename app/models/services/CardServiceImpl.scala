@@ -17,16 +17,15 @@ import scala.concurrent.Future
   */
 class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
 
-  override def savePicture(fbID: String, cardID: String, fileName: String): Future[Double] = {
-    val newPicturePath = EnvironmentVariables.pathToImage(fbID, cardID, fileName)
-    val newPictureFP = PictureFingerPrint.fromImagePath(newPicturePath)
+  override def savePicture(fbID: String, cardID: String, fileName: String, fingerPrint: PictureFingerPrint): Future[Double] = {
     cardDAO.findAll(fbID)
       .flatMap{ cards =>
         val userSet = cards.map(Category.fromCard).toSet
-        val score = ScoreComputing.computeScore(newPictureFP, cardID, userSet)
-        cardDAO.savePicture(fbID, cardID, fileName, score)
+        val score = ScoreComputing.computeScore(fingerPrint, cardID, userSet)
+        val picture = Picture(fileName, score, fingerPrint)
+        cardDAO.savePicture(fbID, cardID, picture)
+          .map(_ => score)
       }
-      .map(_.pictures.last.score)
   }
 
   override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {

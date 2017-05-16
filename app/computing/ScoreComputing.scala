@@ -21,7 +21,9 @@ object ScoreComputing {
     val dif = oldFNN - newFNN
     println(s"Category $newPictureCategoryName improved by $dif} " +
       s"(the bigger the better because oldFNN - newFNN) (newFNN = $newFNN)")
-    if( dif > 1000){
+
+    val score =
+      if( dif > 1000){
       randomScore(7, 10)
     } else if (dif > 500) {
       randomScore(4, 7)
@@ -30,6 +32,8 @@ object ScoreComputing {
     } else {
       randomScore(0, 1)
     }
+
+    score
   }
 
 

@@ -1,6 +1,6 @@
 package models.daos
 
-import models.Card
+import models.{Card, Picture}
 
 import scala.concurrent.Future
 
@@ -8,7 +8,7 @@ trait CardDAO {
 
   def save(card: Card): Future[Card]
 
-  def savePicture(fbID: String, cardID: String, fileName: String, score: Double): Future[Card]
+  def savePicture(fbID: String, cardID: String, picture: Picture): Future[Card]
 
   def find(fbID: String, cardID: String): Future[Option[Card]]
 

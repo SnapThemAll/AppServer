@@ -12,7 +12,7 @@ class SubmodularFunctionTest  extends PlaySpec {
   "Nearest Neighbor submodular function" should {
     "be computed correctly given a user set and validation set" in {
       val fp = PictureFingerPrint.fromImageFile(ls("data").filter(_.isFile).head)
-      println(computeScore(fp, "computer-monitor", Set()))
+      //println(computeScore(fp, "computer-monitor", Set()))
     }
   }
 

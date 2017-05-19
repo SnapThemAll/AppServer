@@ -12,9 +12,9 @@ trait CardDAO {
 
   def find(fbID: String, cardID: String): Future[Option[Card]]
 
-  def findAll(fbID: String): Future[IndexedSeq[Card]]
+  def findAll(fbID: String): Future[Seq[Card]]
 
-  def all: Future[IndexedSeq[Card]]
+  def findAllUsers(cardID: String): Future[Seq[Card]]
 
   def remove(fbID: String, cardID: String): Future[Unit]
 

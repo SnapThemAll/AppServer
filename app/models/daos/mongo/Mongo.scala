@@ -31,6 +31,7 @@ class Mongo @Inject()(environment: Environment, configuration: Configuration) ex
     * @param name The name of the wished collection
     * @return future mongo collection with the given name to which is optionally appended some id
     */
+
   def collection(name: String): Future[JSONCollection] = db.map[JSONCollection](_.collection(name + collSuffix))
 
   private[this] lazy val config = configuration.underlying

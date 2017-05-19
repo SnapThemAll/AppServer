@@ -1,6 +1,5 @@
 package models
 
-import computing.Category
 import play.api.libs.json.{Json, OFormat}
 import utils.EnvironmentVariables
 

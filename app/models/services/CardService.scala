@@ -15,7 +15,7 @@ trait CardService {
 
   def retrievePicture(fbID: String, cardID: String, fileName: String): Future[Option[Picture]]
 
-  def retrieveAll(fbID: String): Future[IndexedSeq[Card]]
+  def retrieveAll(fbID: String): Future[Seq[Card]]
 
   def computeTotalScore(fbID: String): Future[Double]
 

@@ -1,43 +1,44 @@
 package computing
 
-import models.{Picture, PictureFingerPrint}
-import utils.{EnvironmentVariables, Files}
+import models.{Picture, PictureFingerPrint, ValidationCategory}
+import utils.{EnvironmentVariables, Files, Logger}
 
 import scala.util.Random
 
-object ScoreComputing {
+object ScoreComputing extends Logger {
 
   import utils.EnvironmentVariables.validationSet
 
-  def computeScore(newPictureFP: PictureFingerPrint, newPictureCategoryName: String, userSet: Set[Category]) : Double = {
-    val userSetFilled = fillSetWithClutter(userSet, validationSet.map(_.name))
-    val newUserSet = userSetFilled.map{ cat =>
-      if(cat.name == newPictureCategoryName) cat.addPictureFP(newPictureFP) else cat
-    }
+  def computeScore(newPictureFP: PictureFingerPrint, validationCategory: ValidationCategory) : (Float, ValidationCategory) = {
 
-    val oldFNN = fNN(userSetFilled, validationSet)
-    val newFNN = fNN(newUserSet, validationSet)
+    val updatedValidationCategory = validationCategory.computeSimilarites(newPictureFP)
+    val marginalGain = updatedValidationCategory.marginalGain(validationCategory)
 
-    val dif = oldFNN - newFNN
-    println(s"Category $newPictureCategoryName improved by $dif} " +
-      s"(the bigger the better because oldFNN - newFNN) (newFNN = $newFNN)")
+    val score = marginalGain / updatedValidationCategory.averageGain // SCORE = GAIN / AVERAGE GAIN
 
-    val score =
-      if( dif > 1000){
-      randomScore(7, 10)
-    } else if (dif > 500) {
-      randomScore(4, 7)
-    } else if (dif > 0) {
-      randomScore(1, 4)
-    } else {
-      randomScore(0, 1)
-    }
+    logger.info(s"Category ${validationCategory.name} improved by $marginalGain} (the bigger the better). Score: $score")
 
-    score
+    score -> updatedValidationCategory
   }
 
 
-  def w(picA: PictureFingerPrint, picB: PictureFingerPrint): Double = picA.distanceWith(picB)
+  /*
+  def w(picA: PictureFingerPrint, picB: PictureFingerPrint): Double = picA.similarityWith(picB)
+
+
+  def fNNOfCategory(userCat: Category, validationCat: Category): Double = {
+    require(userCat.name == validationCat.name,
+      "fNN of a single category should be done the same one (user and validation)")
+
+    (for{
+      validationPic <- validationCat.pictures
+    } yield {
+      userCat.pictures
+        .map(userPic => w(validationPic, userPic))
+        .max
+    }).sum
+  }
+
 
   def fNN(userSet: Set[Category], validationSet: Set[Category]): Double = {
     require(userSet.size == validationSet.size,
@@ -49,13 +50,8 @@ object ScoreComputing {
     )
 
     validationSet.map { y =>
-      y.pictures.map{ i =>
-        userSet.find(cat => cat.name == y.name)
-          .get
-          .pictures.map{ s =>
-            w(i, s)
-        }.min
-      }.sum
+      val userCat = userSet.find(cat => cat.name == y.name).get
+      fNNOfCategory(userCat, y)
     }.sum
   }
 
@@ -67,10 +63,11 @@ object ScoreComputing {
     PictureFingerPrint.fromImageFile(randomClutter)
   }
 
-  private def fillSetWithClutter(set: Set[Category], categories: Set[String]): Set[Category] = {
+  private def fillSetWithClutter(set: Set[UserCategory], categories: Set[String]): Set[UserCategory] = {
     val setCatNames = set.map(_.name)
     categories.map{ catName =>
-      set.find(cat => cat.name == catName).getOrElse(Category(catName, Set(randomClutter)))
+      set.find(cat => cat.name == catName).getOrElse(UserCategory(catName, Set(randomClutter)))
     }
   }
+  */
 }

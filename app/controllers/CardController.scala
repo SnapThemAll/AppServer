@@ -11,7 +11,7 @@ import play.api.libs.Files
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
-import utils.EnvironmentVariables
+import utils.DataVariables
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -49,7 +49,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
             val fingerPrint = PictureFingerPrint.fromDescriptor(descriptor)
             cardService.savePicture(uuid, cardID, fileName, fingerPrint)
               .map{ score =>
-                val pictureFolderURI = EnvironmentVariables.pathToFolder(uuid, cardID)
+                val pictureFolderURI = DataVariables.pathToFolder(uuid, cardID)
                 val pictureFile = new File(pictureFolderURI + fileName)
                 new File(pictureFolderURI).mkdirs()
                 picture.ref.moveTo(pictureFile)
@@ -70,7 +70,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
         val uuid = identity.loginInfo.providerKey
-        val pictureURI = EnvironmentVariables.pathToImage(uuid, cardID, fileName)
+        val pictureURI = DataVariables.pathToImage(uuid, cardID, fileName)
         cardService.retrievePicture(uuid, cardID, fileName).map{
           case Some(_) => Ok.sendFile(new File(pictureURI))
           case None => NotFound
@@ -103,7 +103,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(request) { identity =>
         val uuid = identity.loginInfo.providerKey
-        val pictureURI = EnvironmentVariables.pathToImage(uuid, cardID, fileName)
+        val pictureURI = DataVariables.pathToImage(uuid, cardID, fileName)
         cardService.removePicture(uuid, cardID, fileName)
           .map{ _ =>
             //if(new File(pictureURI).delete()){

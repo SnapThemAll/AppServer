@@ -1,6 +1,6 @@
 package models.daos.mongo
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import models.ValidationCategory
 import models.daos.ValidationCategoryDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -14,6 +14,7 @@ import scala.concurrent.Future
   * Give access to the [[ValidationCategory]] object.
   * Uses ReactiveMongo to access the MongoDB database
   */
+@Singleton
 class ValidationCategoryDAOMongo @Inject()(mongoDB: Mongo) extends ValidationCategoryDAO {
 
   implicit val validationCategoryJsonFormat: OFormat[ValidationCategory] = ValidationCategory.jsonFormat

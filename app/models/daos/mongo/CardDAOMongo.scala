@@ -1,6 +1,6 @@
 package models.daos.mongo
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import models.daos.CardDAO
 import models.{Card, Picture}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -13,6 +13,7 @@ import scala.concurrent.Future
   * Give access to the [[Card]] object.
   * Uses ReactiveMongo to access the MongoDB database
   */
+@Singleton
 class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
 
   implicit val cardJsonFormat: OFormat[Card] = Card.jsonFormat

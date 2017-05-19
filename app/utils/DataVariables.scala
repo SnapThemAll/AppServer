@@ -1,23 +1,26 @@
 package utils
 
-import models.{PictureFingerPrint, UserCategory}
+import models.{Category, PictureFingerPrint, UserCategory}
 import utils.Files.ls
 
 
-object EnvironmentVariables {
+object DataVariables {
 
   val absolutePathToData: String = "/home/snap/data/"
-  val validationDir = absolutePathToData + "validation"
-  val samplesDir = absolutePathToData + "sample"
 
-  val validationSet: Set[UserCategory] = dataSetFromFolder(absolutePathToData + "validation")
+  private val validationDir = absolutePathToData + "validation"
+  private val sampleDir = absolutePathToData + "sample"
+
+  lazy val validationSet: Set[Category] = dataSetFromFolder(validationDir)
+  lazy val sampleSet: Set[Category] = dataSetFromFolder(sampleDir)
 
   def pathToFolder(fbID: String, cardID: String): String =
     absolutePathToData + s"users/$fbID/$cardID/"
+
   def pathToImage(fbID: String, cardID: String, fileName: String): String =
     absolutePathToData + s"users/$fbID/$cardID/$fileName"
 
-  private def dataSetFromFolder(dir: String): Set[UserCategory] = {
+  private def dataSetFromFolder(dir: String): Set[Category] = {
     (for {
       cardFolder <- ls(dir).filter(_.isDirectory)
     } yield {

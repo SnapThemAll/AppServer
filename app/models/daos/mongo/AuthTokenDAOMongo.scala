@@ -2,7 +2,7 @@ package models.daos.mongo
 
 import java.util.UUID
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import models.AuthToken
 import models.AuthToken.jsonFormat
 import models.daos.AuthTokenDAO
@@ -17,6 +17,7 @@ import scala.concurrent.Future
   * Give access to the [[AuthToken]] object.
   * Uses quill to access the database
   */
+@Singleton
 class AuthTokenDAOMongo @Inject()(mongoDB: Mongo) extends AuthTokenDAO {
 
   private[this] def authTokenColl = mongoDB.collection("authtoken")

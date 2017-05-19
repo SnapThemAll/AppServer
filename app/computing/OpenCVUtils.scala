@@ -6,22 +6,16 @@ import org.bytedeco.javacpp.indexer.UByteRawIndexer
 import org.bytedeco.javacpp.opencv_core._
 import org.bytedeco.javacpp.opencv_features2d.{BFMatcher, ORB}
 import org.bytedeco.javacpp.opencv_imgcodecs.{IMREAD_COLOR, imread}
+import utils.Logger
 
-object OpenCVUtils {
+object OpenCVUtils extends Logger {
 
   def computeDescriptor(file: File): Mat = {
     computeDescriptor(loadOrExit(file))
   }
 
-  def distance(descriptor1: Mat, descriptor2: Mat, numberToSelect: Int = 25): Float = {
-    // Create feature matcher
-    val matcher = new BFMatcher(NORM_HAMMING, false)
-    val matches = new DMatchVector()
-
-    matcher.`match`(descriptor1, descriptor2, matches)
-
-    //compute distance over the best n matches
-    distanceOfBestMatches(matches, numberToSelect)
+  def similarity(descriptor1: Mat, descriptor2: Mat, maxDistance: Float = ???, numberToSelect: Int = 100): Float = {
+    maxDistance - distance(descriptor1, descriptor2, numberToSelect)
   }
 
   def buildDescriptor(rows: Int, cols: Int, `type`: Int, data: IndexedSeq[Int]): Mat = {
@@ -49,13 +43,24 @@ object OpenCVUtils {
     for (i <- 0 until size) yield indexer.get(0, 0, i)
   }
 
+  def distance(descriptor1: Mat, descriptor2: Mat, numberToSelect: Int): Float = {
+    // Create feature matcher
+    val matcher = new BFMatcher(NORM_HAMMING, false)
+    val matches = new DMatchVector()
+
+    matcher.`match`(descriptor1, descriptor2, matches)
+
+    //compute distance over the best n matches
+    distanceOfBestMatches(matches, numberToSelect)
+  }
+
   private def loadOrExit(file: File, flags: Int = IMREAD_COLOR): Mat = {
     // Read input image
     val image = imread(file.getAbsolutePath, flags)
     if (image.empty()) {
-      println("Couldn't load image: " + file.getAbsolutePath)
+      logger.error("Couldn't load image: " + file.getAbsolutePath)
     }
-    println("Computing FingerPrint of picture: " + file.getAbsolutePath)
+    logger.info("Computing FingerPrint of picture: " + file.getAbsolutePath)
     image
   }
 
@@ -64,13 +69,13 @@ object OpenCVUtils {
     val descriptor = new Mat()
 
     val orb = ORB.create(
-      200, //nFeatures
+      500, //nFeatures
       1.2f,  //scaleFactor
       8,  //nlevels
       31,  //edgeThreshold
       0,  //firstLevel
       2,  //WTA_K
-      ORB.HARRIS_SCORE, //scoreTypw
+      ORB.HARRIS_SCORE, //scoreType
       31, //patchSize
       20 //fastThreshold
     )
@@ -86,9 +91,9 @@ object OpenCVUtils {
     // Convert to Scala collection, and sort
     val sorted = toIndexedSeq(matches)//.sortWith(_ lessThan _)
     if(sorted.size < numberToSelect){
-      println(s"Number of matches (${sorted.size}) is smaller than numberToSelect ($numberToSelect)")
+      logger.error(s"Number of matches (${sorted.size}) is smaller than numberToSelect ($numberToSelect)")
     }
-    sorted.map(_.distance()).sortWith(_ < _).take(numberToSelect).sum
+    sorted.map(`match` => `match`.distance()).sortWith(_ < _).take(numberToSelect).sum
   }
 
   private def toIndexedSeq(matches: DMatchVector): IndexedSeq[DMatch] = {

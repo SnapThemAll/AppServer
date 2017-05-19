@@ -1,15 +1,13 @@
 package models.daos.mongo
 
-
 import com.google.inject.Inject
-import models.{Card, Picture, PictureFingerPrint}
 import models.daos.CardDAO
+import models.{Card, Picture}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{Json, OFormat}
 import reactivemongo.play.json._
 
 import scala.concurrent.Future
-import scala.util.Random
 
 /**
   * Give access to the [[Card]] object.
@@ -26,19 +24,19 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
       _.find(Json.obj("fbID" -> fbID, "cardID" -> cardID)).one[Card]
     )
 
-  override def findAll(fbID: String): Future[IndexedSeq[Card]] =
+  override def findAll(fbID: String): Future[Seq[Card]] =
     cardColl.flatMap(
       _.find(Json.obj("fbID" -> fbID))
         .cursor[Card]()
         .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAll in card dao"))
-    ).map(_.toIndexedSeq)
+    )
 
-  override def all: Future[IndexedSeq[Card]] =
+  override def findAllUsers(cardID: String): Future[Seq[Card]] =
     cardColl.flatMap(
-      _.find(Json.obj())
+      _.find(Json.obj("cardID" -> cardID))
         .cursor[Card]()
-        .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("all in card dao"))
-    ).map(_.toIndexedSeq)
+        .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAllUsers in card dao"))
+    )
 
   override def save(card: Card): Future[Card] =
     cardColl

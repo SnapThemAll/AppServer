@@ -2,9 +2,9 @@ package models.services
 
 import javax.inject.Inject
 
-import computing.{Category, ScoreComputing}
-import models.{Card, Picture, PictureFingerPrint}
-import models.daos.CardDAO
+import computing.ScoreComputing
+import models._
+import models.daos.{CardDAO, ValidationCategoryDAO}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import utils.EnvironmentVariables
 
@@ -14,18 +14,22 @@ import scala.concurrent.Future
   * Handles actions to cards.
   *
   * @param cardDAO The card DAO implementation.
+  * @param validationCategoryDAO The validationCategory DAO implementation
   */
-class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
+class CardServiceImpl @Inject()(cardDAO: CardDAO, validationCategoryDAO: ValidationCategoryDAO) extends CardService {
 
   override def savePicture(fbID: String, cardID: String, fileName: String, fingerPrint: PictureFingerPrint): Future[Double] = {
-    cardDAO.findAll(fbID)
-      .flatMap{ cards =>
-        val userSet = cards.map(Category.fromCard).toSet
-        val score = ScoreComputing.computeScore(fingerPrint, cardID, userSet)
+    validationCategoryDAO.find(cardID).map(_.get)
+      .flatMap{ validationCategory =>
+        
+        val (score, newValidationCat) = ScoreComputing.computeScore(fingerPrint, validationCategory)
         val picture = Picture(fileName, score, fingerPrint)
-        cardDAO.savePicture(fbID, cardID, picture)
-          .map(_ => score)
-      }
+
+        validationCategoryDAO.save(newValidationCat).flatMap{_ =>
+          cardDAO.savePicture(fbID, cardID, picture)
+            .map(_ => score)
+          }
+        }
   }
 
   override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {
@@ -40,7 +44,7 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO) extends CardService {
     }
   }
 
-  override def retrieveAll(fbID: String): Future[IndexedSeq[Card]] = {
+  override def retrieveAll(fbID: String): Future[Seq[Card]] = {
     cardDAO.findAll(fbID).map{ cards =>
       cards.map(_.getNotDeleted).filter(_.pictures.nonEmpty)
     }

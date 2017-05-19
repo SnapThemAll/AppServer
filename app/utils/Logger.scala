@@ -8,5 +8,5 @@ trait Logger {
   /**
     * A named logger instance.
     */
-  val logger = play.api.Logger(this.getClass)
+  val logger = play.api.Logger(this.getClass).logger
 }

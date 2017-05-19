@@ -2,7 +2,7 @@ package modules
 
 import com.google.inject.AbstractModule
 import models.daos._
-import models.daos.mongo.{AuthTokenDAOMongo, CardDAOMongo, UserDAOMongo}
+import models.daos.mongo._
 import models.services._
 import net.codingwell.scalaguice.ScalaModule
 import play.api.libs.concurrent.AkkaGuiceSupport
@@ -16,9 +16,10 @@ class BaseModule extends AbstractModule with ScalaModule with AkkaGuiceSupport {
     * Configures the module.
     */
   def configure(): Unit = {
-    bind[UserDAO].to[UserDAOMongo]
     bind[AuthTokenDAO].to[AuthTokenDAOMongo]
+    bind[UserDAO].to[UserDAOMongo]
     bind[CardDAO].to[CardDAOMongo]
+    bind[ValidationCategoryDAO].to[ValidationCategoryDAOMongo]
 
     bind[AuthTokenService].to[AuthTokenServiceImpl]
     bind[UserService].to[UserServiceImpl]

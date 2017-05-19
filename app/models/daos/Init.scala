@@ -2,6 +2,7 @@ package models.daos
 
 import com.google.inject.{Inject, Singleton}
 import models.{Category, UserCategory, ValidationCategory}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
 
@@ -12,8 +13,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
 
   validationCategoryDAO.find("backpack").flatMap{ catOpt =>
     if(catOpt.isDefined){
-      println("Database is already setup")
-      Future.successful()
+      Future.successful(println("Database is already setup"))
     } else {
       println("Setting up database")
       setupValidationCategories(validationCategoryDAO)

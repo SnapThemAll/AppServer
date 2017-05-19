@@ -17,6 +17,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
     } else {
       println("Setting up database")
       setupValidationCategories(validationCategoryDAO)
+      .map(_ => println("Database updated"))
     }
 
   }

@@ -6,7 +6,7 @@ import computing.ScoreComputing
 import models._
 import models.daos.{CardDAO, ValidationCategoryDAO}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import utils.EnvironmentVariables
+import utils.DataVariables
 
 import scala.concurrent.Future
 

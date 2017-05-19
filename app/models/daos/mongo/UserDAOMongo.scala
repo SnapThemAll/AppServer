@@ -2,7 +2,7 @@ package models.daos.mongo
 
 import java.util.UUID
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import com.mohiva.play.silhouette.api.LoginInfo
 import models.User
 import models.User.jsonFormat
@@ -17,6 +17,7 @@ import scala.concurrent.Future
   * Give access to the [[User]] object.
   * Uses ReactiveMongo to access the MongoDB database
   */
+@Singleton
 class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
 
   private[this] def userColl = mongoDB.collection("user")

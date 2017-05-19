@@ -1,7 +1,7 @@
 package models
 
 import play.api.libs.json.{Json, OFormat}
-import utils.EnvironmentVariables
+import utils.DataVariables
 
 /**
   * The Card object.
@@ -13,7 +13,7 @@ case class Card(cardID: String,
                 pictures: IndexedSeq[Picture] = IndexedSeq.empty
                ) {
 
-  private def picturePath(fileName: String): String = EnvironmentVariables.pathToImage(fbID, cardID, fileName)
+  private def picturePath(fileName: String): String = DataVariables.pathToImage(fbID, cardID, fileName)
 
   def bestScore: Double = pictures.map(_.score).max
 
@@ -32,7 +32,7 @@ case class Card(cardID: String,
     this.copy(pictures = pictures.filterNot(_.deleted))
 
   def pictureFileNames: IndexedSeq[String] =
-    pictures.map(pic => EnvironmentVariables.pathToImage(fbID, cardID, pic.fileName))
+    pictures.map(pic => DataVariables.pathToImage(fbID, cardID, pic.fileName))
 
 }
 object Card {

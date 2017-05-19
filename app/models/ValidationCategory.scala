@@ -9,10 +9,16 @@ case class ValidationCategory(
                                numberOfImprovements: Long
                              ) extends Category {
 
-  override val picturesFP: Set[PictureFingerPrint] = validationPictures.map(_.pictureFP)
+  override lazy val picturesFP: Set[PictureFingerPrint] = validationPictures.map(_.pictureFP)
 
   val similaritiesScore: Float = validationPictures.map(_.highestSimilarity).sum
 
+
+  def addFP(picturesFP: Set[PictureFingerPrint]): ValidationCategory = {
+    picturesFP.foldLeft(this) { case (updatedValidationCategory, newPictureFP) =>
+      updatedValidationCategory.computeSimilarites(newPictureFP)
+    }
+  }
   def computeSimilarites(newPictureFP: PictureFingerPrint): ValidationCategory = {
     val newValidationPictures = validationPictures.map(_.computeSimilarity(newPictureFP))
     val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore

@@ -1,13 +1,11 @@
 package computing
 
 import models.{Picture, PictureFingerPrint, ValidationCategory}
-import utils.{EnvironmentVariables, Files, Logger}
+import utils.{DataVariables, Files, Logger}
 
 import scala.util.Random
 
 object ScoreComputing extends Logger {
-
-  import utils.EnvironmentVariables.validationSet
 
   def computeScore(newPictureFP: PictureFingerPrint, validationCategory: ValidationCategory) : (Float, ValidationCategory) = {
 

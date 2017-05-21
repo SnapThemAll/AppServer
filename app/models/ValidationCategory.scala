@@ -1,13 +1,14 @@
 package models
 
 import play.api.libs.json.{Json, OFormat}
+import utils.Logger
 
 case class ValidationCategory(
                                name: String,
                                validationPictures: Set[ValidationPicture],
                                averageGain: Float,
                                numberOfImprovements: Long
-                             ) extends Category {
+                             ) extends Category with Logger {
 
   override lazy val picturesFP: Set[PictureFingerPrint] = validationPictures.map(_.pictureFP)
 
@@ -20,8 +21,11 @@ case class ValidationCategory(
     }
   }
   def computeSimilarites(newPictureFP: PictureFingerPrint): ValidationCategory = {
-    val newValidationPictures = validationPictures.map(_.computeSimilarity(newPictureFP))
+    val newValidationPictures = validationPictures.map(_.updateSimilarity(newPictureFP))
     val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore
+    log(s"old similarities score: $similaritiesScore\n\t" +
+      s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
+      s"new - old = $newGain")
     val newAverageGain = // WE SHOULD ONLY UPDATE AVERAGE GAIN IF THERE'S AN IMPROVEMENT
       if(newGain > 0) {
         (averageGain * numberOfImprovements + newGain) / (numberOfImprovements + 1)

@@ -3,34 +3,49 @@ package models.daos
 import com.google.inject.{Inject, Singleton}
 import models.{Category, UserCategory, ValidationCategory}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import utils.Logger
 
 import scala.concurrent.Future
 
 @Singleton
-class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
+class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logger {
 
-  println("Checking if init is needed")
+  log("Checking if init is needed")
 
   validationCategoryDAO.find("backpack").flatMap{ catOpt =>
     if(catOpt.isDefined){
-      Future.successful(println("Database is already setup"))
+      Future.successful(log("Database is already setup"))
     } else {
-      println("Setting up database")
-      setupValidationCategories(validationCategoryDAO)
-      .map(_ => println("Database updated"))
+      log("Setting up database")
+      setupValidationCategories2(validationCategoryDAO)
+      .map(numCat => log(s"Database updated (with $numCat categories)"))
     }
 
   }
-//
-//
-//  private def setupValidationCategories2(validationCategoryDAO: ValidationCategoryDAO): Future[Unit] = {
-//    import utils.DataVariables.{categories, computeSampleCategory, computeValidationCategory}
-//
-//    categories.foreach{ catName =>
-//      val validationCategory = computeValidationCategory(catName)
-//      val sampleCategory = computeSampleCategory(catName)
-//    }
-//  }
+
+
+  private def setupValidationCategories2(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
+    import utils.DataVariables.{categories, computeSampleCategory, computeValidationCategory}
+
+    Future.sequence {
+      categories.map { catName =>
+        var validationCategory = ValidationCategory.initFromCategory(computeValidationCategory(catName))
+        val sampleCategory = computeSampleCategory(catName)
+
+        val splitIndex = Math.round(sampleCategory.picturesFP.size * 1f / 4)
+        val (beforeUserPicturesFP, fakeUserPicturesFP) = sampleCategory.picturesFP.splitAt(splitIndex)
+
+        validationCategory = validationCategory
+          .addFP(beforeUserPicturesFP)
+          .copy(averageGain = 0f, numberOfImprovements = 0l)
+
+        validationCategory = validationCategory
+          .addFP(fakeUserPicturesFP)
+
+        validationCategoryDAO.save(validationCategory).map(_ => true)
+      }
+    }.map(_.count(_ && true))
+  }
 
   private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Stream[ValidationCategory]] = {
     import utils.DataVariables._

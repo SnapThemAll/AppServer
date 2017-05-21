@@ -16,10 +16,10 @@ object DataVariables extends Logger {
   lazy val categories: Set[String] = ls(validationDir).map(_.getName).toSet
 
   private var cache: Queue[(String, Set[Descriptor])] = Queue.empty
-  private var cacheSize = 10
+  private var cacheSize = 60
   def getValidationDescriptors(category: String): Set[Descriptor] = {
     cache.find( _._1 == category ).map(_._2).getOrElse{
-      if(cache.size < 10){
+      if(cache.size <= cacheSize){
         val descriptors = listValidationFileNames(category)
           .map(fileName => Descriptor.fromImagePath(pathToValidationImage(category, fileName)))
         cache = cache.enqueue(category -> descriptors)

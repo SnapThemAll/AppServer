@@ -20,13 +20,20 @@ case class ValidationCategory(
     }
   }
   def computeSimilarites(descriptor: Descriptor): ValidationCategory = {
-    val newValidationPictures = validationPictures.map{valPic =>
+    val newValidationPictures = validationPictures.map{ valPic =>
       val similarity = getValidationDescriptor(category, valPic.fileName).similarityWith(descriptor)
-      valPic.updateSimilarity(similarity)}
+      val newValPic = valPic.updateSimilarity(similarity)
+      if(valPic.highestSimilarity > newValPic.highestSimilarity){
+        error("OLD Validation picture cannot be greater than the NEW one")
+      }
+      newValPic
+    }
     val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore
-    log(s"old similarities score: $similaritiesScore\n\t" +
-      s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
-      s"new - old = $newGain")
+    if(newGain < 0){
+      error(s"old similarities score: $similaritiesScore\n\t" +
+        s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
+        s"new - old = $newGain")
+    }
     val newAverageGain = // WE SHOULD ONLY UPDATE AVERAGE GAIN IF THERE'S AN IMPROVEMENT
       if(newGain > 0) {
         (averageGain * numberOfImprovements + newGain) / (numberOfImprovements + 1)

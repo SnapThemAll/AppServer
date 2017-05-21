@@ -27,7 +27,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
 
 
   private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
-    import utils.DataVariables._
+    import utils.DataVariables.{categories, listValidationFileNames, listSampleFileNames}
 
     Future.sequence {
       categories.map { catName =>

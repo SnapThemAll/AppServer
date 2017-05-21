@@ -6,31 +6,40 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import utils.Logger
 
 import scala.concurrent.Future
+import utils.DataVariables.categories
 
 @Singleton
 class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logger {
 
   log("Checking if init is needed")
 
-  validationCategoryDAO.find("keyboard").flatMap{ catOpt =>
-    if(catOpt.isDefined){
-      Future.successful(log("Database is already setup"))
-    } else {
-      log("Setting up database")
-      setupValidationCategories(validationCategoryDAO)
-      .map(numCat => log(s"Database set up (with $numCat categories)"))
-    }
+  Future.sequence{
+    categories
+      .map { category =>
+        validationCategoryDAO.find(category)
+          .map(optCategory => category -> optCategory.isEmpty)
+      }
+  } .map(_.filter(_._2))
+    .map(_.map(_._1))
+    .foreach{ categoriesToCompute =>
+      if(categoriesToCompute.isEmpty){
+        Future.successful(log("Database is already setup"))
+      } else {
+        log("Setting up database")
+        setupValidationCategories(categoriesToCompute, validationCategoryDAO)
+          .map(numCat => log(s"Database set up (with $numCat categories)"))
+      }
 
-  }
+    }
 
   private def percentage(percent: Int): Float = percent / 100f
 
 
-  private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
-    import utils.DataVariables.{categories, listValidationFileNames, listSampleFileNames, pathToSampleImage}
+  private def setupValidationCategories(categoriesToCompute: Set[String], validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
+    import utils.DataVariables.{listValidationFileNames, listSampleFileNames, pathToSampleImage}
 
     Future.sequence {
-      categories.map { catName =>
+      categoriesToCompute.toList.map{ catName =>
         log(s"Creating validation category $catName...")
         var validationCategory = ValidationCategory.initFromCategory(catName, listValidationFileNames(catName))
         log("DONE")
@@ -54,7 +63,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
 
         validationCategoryDAO.save(validationCategory).map(_ => true)
       }
-    }.map(_.count(_ && true))
+    }.map(_.size)
   }
 
 }

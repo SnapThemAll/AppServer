@@ -1,7 +1,10 @@
 
-val a = Set(1, 2, 3)
-val b = Set(3, 4, 5)
+val list = List.range(0, 10)
 
-val c = Set(a, b)
+val stream = list.toStream.map(i => {println(i); i * 10})
 
-c.reduce(_ ++ _)
+stream(0)
+
+stream(1)
+
+stream(2)

@@ -59,9 +59,9 @@ object OpenCVUtils extends Logger {
     // Read input image
     val image = imread(file.getAbsolutePath, flags)
     if (image.empty()) {
-      logger.error("Couldn't load image: " + file.getAbsolutePath)
+      error("Couldn't load image: " + file.getAbsolutePath)
     }
-    logger.info("Computing FingerPrint of picture: " + file.getAbsolutePath)
+    log("Computing FingerPrint of picture: " + file.getAbsolutePath)
     image
   }
 
@@ -92,7 +92,7 @@ object OpenCVUtils extends Logger {
     // Convert to Scala collection, and sort
     val sorted = toIndexedSeq(matches)//.sortWith(_ lessThan _)
     if(sorted.size < numberToSelect){
-      logger.error(s"Number of matches (${sorted.size}) is smaller than numberToSelect ($numberToSelect)")
+      error(s"Number of matches (${sorted.size}) is smaller than numberToSelect ($numberToSelect)")
     }
     sorted.map(`match` => `match`.distance()).sortWith(_ < _).take(numberToSelect).sum
   }

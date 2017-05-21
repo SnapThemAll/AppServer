@@ -29,7 +29,7 @@ object Utils extends Logger {
 
   def recoverFromInternalServerError: PartialFunction[Throwable, Result] =
     PartialFunction[Throwable, Result] { t =>
-      logger.error("Error while answering a request", t)
+      error("Error while answering a request", t)
       InternalServerError("An internal server error occurred. We are working on it.")
     }
 }

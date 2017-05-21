@@ -48,10 +48,10 @@ class Mongo @Inject()(environment: Environment, configuration: Configuration) ex
 
   private[this] lazy val connection: MongoConnection = getStringConfig("server") match {
     case Success(server) =>
-      logger.info("Established connection to Mongo server " + server)
+      log("Established connection to Mongo server " + server)
       mongoDriver.connection(List(server))
     case _ =>
-      logger.error(s"Can't find config for Mongo server under $configPath.server. Will use default server: localhost")
+      error(s"Can't find config for Mongo server under $configPath.server. Will use default server: localhost")
       mongoDriver.connection(List("localhost"))
   }
 
@@ -74,7 +74,7 @@ class Mongo @Inject()(environment: Environment, configuration: Configuration) ex
     case Success(database) =>
       connection.database(database + dbSuffix)
     case _ =>
-      logger.error(
+      error(
           s"Can't find config for Mongo database name under $configPath.database. Will use default db: snapthemall")
       connection.database("snapthemall" + dbSuffix)
   }
@@ -90,13 +90,13 @@ object Mongo extends Logger {
   private lazy val mongoDriver = new reactivemongo.api.MongoDriver
 
   private[daos] def cursonErrorHandler[T](context: String = "a dao"): Cursor.ErrorHandler[Seq[T]] = {
-    (last: Seq[T], error: Throwable) =>
-      logger.error(s"Encounter error in $context: $error.\nLast: $last")
+    (last: Seq[T], err: Throwable) =>
+      error(s"Encounter error in $context: $err.\nLast: $last")
 
       if (last.isEmpty) { // continue, skip error if no previous value
         Cursor.Cont(last)
       } else {
-        Cursor.Fail(error)
+        Cursor.Fail(err)
       }
   }
 

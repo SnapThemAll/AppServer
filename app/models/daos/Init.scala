@@ -23,6 +23,8 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
 
   }
 
+  private def percentage(percent: Int): Float = percent / 100f
+
 
   private def setupValidationCategories2(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
     import utils.DataVariables.{categories, computeSampleCategory, computeValidationCategory}
@@ -32,7 +34,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
         var validationCategory = ValidationCategory.initFromCategory(computeValidationCategory(catName))
         val sampleCategory = computeSampleCategory(catName)
 
-        val splitIndex = Math.round(sampleCategory.picturesFP.size * 1f / 4)
+        val splitIndex = Math.round(sampleCategory.picturesFP.size * percentage(65) )
         val (beforeUserPicturesFP, fakeUserPicturesFP) = sampleCategory.picturesFP.splitAt(splitIndex)
 
         validationCategory = validationCategory

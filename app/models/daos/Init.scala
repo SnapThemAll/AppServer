@@ -27,7 +27,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
 
 
   private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
-    import utils.DataVariables.{categories, listValidationFileNames, listSampleFileNames}
+    import utils.DataVariables.{categories, listValidationFileNames, listSampleFileNames, pathToSampleImage}
 
     Future.sequence {
       categories.map { catName =>
@@ -35,7 +35,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
         var validationCategory = ValidationCategory.initFromCategory(catName, listValidationFileNames(catName))
         log("DONE")
         log(s"Computing sample descriptors of category $catName...")
-        val sampleDescriptors = listSampleFileNames(catName).map(Descriptor.fromImagePath)
+        val sampleDescriptors = listSampleFileNames(catName).map(fileName => Descriptor.fromImagePath(pathToSampleImage(catName, fileName)))
         log("DONE")
 
         val splitIndex = Math.round(sampleDescriptors.size * percentage(65) )

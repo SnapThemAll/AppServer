@@ -12,7 +12,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
 
   log("Checking if init is needed")
 
-  validationCategoryDAO.find("backpack").flatMap{ catOpt =>
+  validationCategoryDAO.find("keyboard").flatMap{ catOpt =>
     if(catOpt.isDefined){
       Future.successful(log("Database is already setup"))
     } else {

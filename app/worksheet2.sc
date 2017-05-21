@@ -1,14 +1,11 @@
 
-val list = List.range(0, 10)
+val list = List.range(0, 20)
 
-val stream = list.toStream.map(i => {println(i); i * 10}).flatMap(i => {println("--"); List(i, i)})
+private def percentage(percent: Int): Float = percent / 100f
 
-stream(0)
+val splitIndex = Math.round(list.size * percentage(65) )
+val (a, b) = list.splitAt(splitIndex)
 
-stream(1)
+a
 
-stream(2)
-
-stream(3)
-
-stream(4)
+b

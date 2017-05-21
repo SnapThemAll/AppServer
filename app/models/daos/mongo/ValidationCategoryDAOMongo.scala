@@ -19,19 +19,19 @@ class ValidationCategoryDAOMongo @Inject()(mongoDB: Mongo) extends ValidationCat
 
   implicit val validationCategoryJsonFormat: OFormat[ValidationCategory] = ValidationCategory.jsonFormat
 
-  private[this] def validationCategoryColl = mongoDB.collection("validationCategory")
+  private[this] def validationCategoryColl = mongoDB.collection("validation_category")
 
   override def save(validationCategory: ValidationCategory): Future[ValidationCategory] =
     validationCategoryColl
-      .flatMap(_.update(Json.obj("name" -> validationCategory.name), validationCategory, upsert = true))
+      .flatMap(_.update(Json.obj("category" -> validationCategory.category), validationCategory, upsert = true))
       .transform(
         _ => validationCategory,
         t => t
       )
 
-  override def find(categoryName: String): Future[Option[ValidationCategory]] =
+  override def find(category: String): Future[Option[ValidationCategory]] =
     validationCategoryColl.flatMap(
-      _.find(Json.obj("name" -> categoryName)).one[ValidationCategory]
+      _.find(Json.obj("category" -> category)).one[ValidationCategory]
     )
 }
 

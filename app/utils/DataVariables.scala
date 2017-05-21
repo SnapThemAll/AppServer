@@ -1,6 +1,5 @@
 package utils
 
-import models.{Category, PictureFingerPrint, UserCategory}
 import utils.Files.ls
 
 
@@ -13,21 +12,14 @@ object DataVariables extends Logger {
 
   lazy val categories: Set[String] = ls(validationDir).map(_.getName).toSet
 
-  lazy val validationCategories: Stream[Category] = {
-    log("Building validation set...")
-    dataSetFromFolder(validationDir)
-  }
-  lazy val sampleCategories: Stream[Category] = {
-    log("Building sample set...")
-    dataSetFromFolder(sampleDir)
-  }
+  def listValidationFileNames(category: String): Set[String] =
+    listFileNames(pathToValidationFolder(category))
 
-  def computeValidationCategory(categoryName: String): Category = {
-    computeCategory(categoryName, validationDir + categoryName)
-  }
-  def computeSampleCategory(categoryName: String): Category = {
-    computeCategory(categoryName, sampleDir + categoryName)
-  }
+  def listSampleFileNames(category: String): Set[String] =
+    listFileNames(pathToSampleFolder(category))
+
+
+  def listFileNames(dir: String): Set[String] = ls(dir).filter(_.isFile).map(_.getName).toSet
 
   def pathToFolder(fbID: String, cardID: String): String =
     absolutePathToData + s"users/$fbID/$cardID/"
@@ -35,18 +27,16 @@ object DataVariables extends Logger {
   def pathToImage(fbID: String, cardID: String, fileName: String): String =
     absolutePathToData + s"users/$fbID/$cardID/$fileName"
 
+  def pathToValidationFolder(category: String): String =
+    s"$validationDir$category/"
 
-  private def computeCategory(name: String, path: String): Category = {
-    log(s"Building category $name from $path")
-    UserCategory(name, ls(path).map(PictureFingerPrint.fromImageFile).toSet)
-  }
+  def pathToValidationImage(category: String, fileName: String): String =
+    pathToValidationFolder(category) + fileName
 
-  private def dataSetFromFolder(dir: String): Stream[Category] = {
-    ls(dir).filter(_.isDirectory).toStream.map{ catFolder =>
-      log(s"Building category ${catFolder.getName} from ${catFolder.getAbsolutePath}")
-      val images = ls(catFolder).filter(_.isFile)
-      UserCategory(catFolder.getName, images.map(PictureFingerPrint.fromImageFile).toSet)
-    }
-  }
+  def pathToSampleFolder(category: String): String =
+    s"$sampleDir$category/"
+
+  def pathToSampleImage(category: String, fileName: String): String =
+    pathToSampleFolder(category) + fileName
 
 }

@@ -2,26 +2,27 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 import utils.Logger
+import utils.DataVariables.pathToValidationImage
 
 case class ValidationCategory(
-                               name: String,
+                               category: String,
                                validationPictures: Set[ValidationPicture],
                                averageGain: Float,
-                               numberOfImprovements: Long
-                             ) extends Category with Logger {
-
-  override lazy val picturesFP: Set[PictureFingerPrint] = validationPictures.map(_.pictureFP)
+                               numberOfImprovements: Int
+                             ) extends Logger {
 
   val similaritiesScore: Float = validationPictures.map(_.highestSimilarity).sum
 
 
-  def addFP(picturesFP: Set[PictureFingerPrint]): ValidationCategory = {
-    picturesFP.foldLeft(this) { case (updatedValidationCategory, newPictureFP) =>
+  def computeSimilarities(descriptors: Set[Descriptor]): ValidationCategory = {
+    descriptors.foldLeft(this) { case (updatedValidationCategory, newPictureFP) =>
       updatedValidationCategory.computeSimilarites(newPictureFP)
     }
   }
-  def computeSimilarites(newPictureFP: PictureFingerPrint): ValidationCategory = {
-    val newValidationPictures = validationPictures.map(_.updateSimilarity(newPictureFP))
+  def computeSimilarites(descriptor: Descriptor): ValidationCategory = {
+    val newValidationPictures = validationPictures.map{valPic =>
+      val similarity = Descriptor.fromImagePath(pathToValidationImage(category, valPic.fileName)).similarityWith(descriptor)
+      valPic.updateSimilarity(similarity)}
     val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore
     log(s"old similarities score: $similaritiesScore\n\t" +
       s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
@@ -46,12 +47,12 @@ case class ValidationCategory(
 
 object ValidationCategory {
 
-  def initFromCategory(category: Category): ValidationCategory = {
+  def initFromCategory(category: String, fileNames: Set[String]): ValidationCategory = {
     ValidationCategory(
-      category.name,
-      category.picturesFP.map(pFP => ValidationPicture(pFP, 0f)),
+      category,
+      fileNames.map(fileName => ValidationPicture(fileName, 0f)),
       0f,
-      0l
+      0
     )
   }
 

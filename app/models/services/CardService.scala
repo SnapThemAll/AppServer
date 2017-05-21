@@ -1,6 +1,6 @@
 package models.services
 
-import models.{Card, Picture, PictureFingerPrint}
+import models.{Card, Descriptor, Picture}
 
 import scala.concurrent.Future
 
@@ -9,7 +9,7 @@ import scala.concurrent.Future
   */
 trait CardService {
 
-  def savePicture(fbID: String, cardID: String, fileName: String, fingerPrint: PictureFingerPrint): Future[Double]
+  def savePicture(fbID: String, cardID: String, fileName: String, descriptor: Descriptor): Future[Double]
 
   def retrieve(fbID: String, cardID: String): Future[Option[Card]]
 

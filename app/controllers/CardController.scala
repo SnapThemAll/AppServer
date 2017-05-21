@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.reponses.{PictureDataResponse, PictureUploadResponse, ScoreResponse}
-import models.PictureFingerPrint
+import models.Descriptor
 import models.services.CardService
 import play.api.libs.Files
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -24,7 +24,6 @@ import scala.concurrent.Future
 class CardController @Inject()(cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import Utils._
-  import computing.OpenCVUtils.computeDescriptor
 
   def uploadPicture(cardID: String): Action[MultipartFormData[Files.TemporaryFile]] =
     silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
@@ -38,16 +37,15 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
 
           val tmpFile = picture.ref.file
 
-          val descriptor = computeDescriptor(tmpFile)
+          val descriptor = Descriptor.fromImageFile(tmpFile)
 
-          if(descriptor.rows < 100) {
-            log(s"Unprocessable entity: Quality of the image is too low (${descriptor.rows} features)")
+          if(descriptor.descriptorMatrix.rows < 100) {
+            log(s"Unprocessable entity: Quality of the image is too low (${descriptor.descriptorMatrix.rows} features)")
             Future.successful(
               UnprocessableEntity("Quality of the image is too low")
             )
           } else {
-            val fingerPrint = PictureFingerPrint.fromDescriptor(descriptor)
-            cardService.savePicture(uuid, cardID, fileName, fingerPrint)
+            cardService.savePicture(uuid, cardID, fileName, descriptor)
               .map{ score =>
                 val pictureFolderURI = DataVariables.pathToFolder(uuid, cardID)
                 val pictureFile = new File(pictureFolderURI + fileName)

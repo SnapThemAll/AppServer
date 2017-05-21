@@ -7,11 +7,8 @@ case class ValidationPicture(
                               highestSimilarity: Float
                             ) {
 
-  def computeSimilarity(newPictureFP: PictureFingerPrint): ValidationPicture = {
-    this.updateSimilarity(this.pictureFP.similarityWith(newPictureFP))
-  }
-
-  private def updateSimilarity(similarity: Float): ValidationPicture = {
+  def updateSimilarity(newPictureFP: PictureFingerPrint): ValidationPicture = {
+    val similarity = this.pictureFP.similarityWith(newPictureFP)
     if(similarity > highestSimilarity){
       this.copy( highestSimilarity = similarity )
     } else {

@@ -17,7 +17,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
       Future.successful(log("Database is already setup"))
     } else {
       log("Setting up database")
-      setupValidationCategories2(validationCategoryDAO)
+      setupValidationCategories(validationCategoryDAO)
       .map(numCat => log(s"Database set up (with $numCat categories)"))
     }
 
@@ -26,23 +26,31 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
   private def percentage(percent: Int): Float = percent / 100f
 
 
-  private def setupValidationCategories2(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
+  private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
     import utils.DataVariables._
 
     Future.sequence {
       categories.map { catName =>
+        log(s"Creating validation category $catName...")
         var validationCategory = ValidationCategory.initFromCategory(catName, listValidationFileNames(catName))
+        log("DONE")
+        log(s"Computing sample descriptors of category $catName...")
         val sampleDescriptors = listSampleFileNames(catName).map(Descriptor.fromImagePath)
+        log("DONE")
 
         val splitIndex = Math.round(sampleDescriptors.size * percentage(65) )
         val (beforeUserDescriptors, fakeUserDescriptors) = sampleDescriptors.splitAt(splitIndex)
 
+        log(s"Adding before user descriptors to validation category $catName")
         validationCategory = validationCategory
           .computeSimilarities(beforeUserDescriptors)
           .copy(averageGain = 0f, numberOfImprovements = 0)
+        log("DONE")
 
+        log(s"Adding fake user descriptors to validation category $catName")
         validationCategory = validationCategory
           .computeSimilarities(fakeUserDescriptors)
+        log("DONE")
 
         validationCategoryDAO.save(validationCategory).map(_ => true)
       }

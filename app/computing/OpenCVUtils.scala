@@ -58,10 +58,10 @@ object OpenCVUtils extends Logger {
   private def loadOrExit(file: File, flags: Int = IMREAD_COLOR): Mat = {
     // Read input image
     val image = imread(file.getAbsolutePath, flags)
+    log("Computing descriptor of picture: " + file.getAbsolutePath)
     if (image.empty()) {
       error("Couldn't load image: " + file.getAbsolutePath)
     }
-    log("Computing FingerPrint of picture: " + file.getAbsolutePath)
     image
   }
 

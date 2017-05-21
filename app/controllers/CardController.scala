@@ -41,7 +41,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
           val descriptor = computeDescriptor(tmpFile)
 
           if(descriptor.rows < 100) {
-            logger.info(s"Unprocessable entity: Quality of the image is too low (${descriptor.rows} features)")
+            log(s"Unprocessable entity: Quality of the image is too low (${descriptor.rows} features)")
             Future.successful(
               UnprocessableEntity("Quality of the image is too low")
             )
@@ -58,7 +58,7 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
           }
 
         }.getOrElse{
-          logger.info("Unprocessable entity: No picture file found in the request")
+          log("Unprocessable entity: No picture file found in the request")
           Future.successful(
             BadRequest("No picture file found in the request")
           )

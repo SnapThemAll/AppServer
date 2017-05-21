@@ -40,13 +40,13 @@ class AuthTokenCleaner @Inject()(service: AuthTokenService, clock: Clock) extend
             msg.append("=================================\n")
 
             msg.append("=================================\n")
-            logger.info(msg.toString)
+            log(msg.toString)
             deleted
           }.recover {
             case e =>
               msg.append("Couldn't cleanup auth tokens because of unexpected error\n")
               msg.append("=================================\n")
-              logger.error(msg.toString, e)
+              error(msg.toString, e)
               throw e
           }
       )

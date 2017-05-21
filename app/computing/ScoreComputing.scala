@@ -12,7 +12,7 @@ object ScoreComputing extends Logger {
 
     val score = marginalGain / updatedValidationCategory.averageGain // SCORE = GAIN / AVERAGE GAIN
 
-    logger.info(s"Category ${validationCategory.name} improved by $marginalGain} (the bigger the better). Score: $score")
+    log(s"Category ${validationCategory.name} improved by $marginalGain} (the bigger the better). Score: $score")
 
     score -> updatedValidationCategory
   }

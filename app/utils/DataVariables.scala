@@ -4,15 +4,21 @@ import models.{Category, PictureFingerPrint, UserCategory}
 import utils.Files.ls
 
 
-object DataVariables {
+object DataVariables extends Logger {
 
   val absolutePathToData: String = "/home/snap/data/"
 
   private val validationDir = absolutePathToData + "validation"
   private val sampleDir = absolutePathToData + "sample"
 
-  lazy val validationSet: Set[Category] = dataSetFromFolder(validationDir)
-  lazy val sampleSet: Set[Category] = dataSetFromFolder(sampleDir)
+  lazy val validationSet: Set[Category] = {
+    log("Building validation set...")
+    dataSetFromFolder(validationDir)
+  }
+  lazy val sampleSet: Set[Category] = {
+    log("Building sample set...")
+    dataSetFromFolder(sampleDir)
+  }
 
   def pathToFolder(fbID: String, cardID: String): String =
     absolutePathToData + s"users/$fbID/$cardID/"

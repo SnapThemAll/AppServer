@@ -14,7 +14,7 @@ object OpenCVUtils extends Logger {
     computeDescriptor(loadOrExit(file))
   }
 
-  // to be safe, I put maxDistance at 1000 * number of matches to select (100 would be enough 99.9% of the time)
+  // to be safe, I put maxDistance at 1000 * number of matches to select (100 would be enough 99.99% of the time)
   def similarity(descriptor1: Mat, descriptor2: Mat, maxDistance: Float = 100000f, numberToSelect: Int = 100): Float = {
     Math.max(0f, maxDistance - distance(descriptor1, descriptor2, numberToSelect))
   }

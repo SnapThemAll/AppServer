@@ -6,7 +6,6 @@ import play.api.libs.json.{Json, OFormat}
 case class Picture(
                     fileName: String,
                     score: Double,
-                    fingerPrint: PictureFingerPrint,
                     deleted: Boolean = false
                   ) {
   def delete: Picture = this.copy(deleted = true)

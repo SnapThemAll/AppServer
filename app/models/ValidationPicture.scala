@@ -3,12 +3,11 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class ValidationPicture(
-                              pictureFP: PictureFingerPrint,
+                              fileName: String,
                               highestSimilarity: Float
                             ) {
 
-  def updateSimilarity(newPictureFP: PictureFingerPrint): ValidationPicture = {
-    val similarity = this.pictureFP.similarityWith(newPictureFP)
+  def updateSimilarity(similarity: Float): ValidationPicture = {
     if(similarity > highestSimilarity){
       this.copy( highestSimilarity = similarity )
     } else {

@@ -21,16 +21,26 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
     }
 
   }
+//
+//
+//  private def setupValidationCategories2(validationCategoryDAO: ValidationCategoryDAO): Future[Unit] = {
+//    import utils.DataVariables.{categories, computeSampleCategory, computeValidationCategory}
+//
+//    categories.foreach{ catName =>
+//      val validationCategory = computeValidationCategory(catName)
+//      val sampleCategory = computeSampleCategory(catName)
+//    }
+//  }
 
-  private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Set[ValidationCategory]] = {
+  private def setupValidationCategories(validationCategoryDAO: ValidationCategoryDAO): Future[Stream[ValidationCategory]] = {
     import utils.DataVariables._
 
-    validationSet // STARTS THE COMPUTATIONS (LAZY VAL), Hednce, (as it is blocking)
-    sampleSet     // we're (almost) sure DB will be ready after the startup
+    validationCategories // STARTS THE COMPUTATIONS (LAZY VAL), Hence, (as it is blocking)
+    sampleCategories     // we're (almost) sure DB will be ready after the startup
 
-    val (beforeUserSet, fakeUserSet) = partitionCategories(1f/4, sampleSet)
+    val (beforeUserSet, fakeUserSet) = partitionCategories(1f/4, sampleCategories)
 
-    initValidationCategories(validationSet)
+    initValidationCategories(validationCategories)
       .flatMap{ validationCat =>
         Future.sequence(
           addUserSet(beforeUserSet, validationCat).map( valCat =>
@@ -46,7 +56,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
   }
 
 
-  private def addUserSet(userSet: Set[Category], validationSet: Set[ValidationCategory]): Set[ValidationCategory] = {
+  private def addUserSet(userSet: Stream[Category], validationSet: Stream[ValidationCategory]): Stream[ValidationCategory] = {
     validationSet.map { valCat =>
       val userCat = userSet.find(_.name == valCat.name)
         .getOrElse(throw new IllegalArgumentException
@@ -57,7 +67,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
   }
 
 
-  private def initValidationCategories(validationSet: Set[Category]): Future[Set[ValidationCategory]] = {
+  private def initValidationCategories(validationSet: Stream[Category]): Future[Stream[ValidationCategory]] = {
     Future.sequence(
       validationSet.map{cat =>
         validationCategoryDAO.save(ValidationCategory.initFromCategory(cat))
@@ -65,7 +75,7 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) {
     )
   }
 
-  private def partitionCategories(percentage: Float, categories: Set[Category]): (Set[Category], Set[Category]) = {
+  private def partitionCategories(percentage: Float, categories: Stream[Category]): (Stream[Category], Stream[Category]) = {
     require(percentage >= 0 && percentage <= 1, s"percentage shoud be between 0 and 1, not $percentage")
 
     categories.map{ cat =>

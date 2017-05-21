@@ -6,7 +6,7 @@ import computing.ScoreComputing
 import models._
 import models.daos.{CardDAO, ValidationCategoryDAO}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import utils.DataVariables
+import utils.{DataVariables, Logger}
 
 import scala.concurrent.Future
 
@@ -16,16 +16,20 @@ import scala.concurrent.Future
   * @param cardDAO The card DAO implementation.
   * @param validationCategoryDAO The validationCategory DAO implementation
   */
-class CardServiceImpl @Inject()(cardDAO: CardDAO, validationCategoryDAO: ValidationCategoryDAO) extends CardService {
+class CardServiceImpl @Inject()(cardDAO: CardDAO, validationCategoryDAO: ValidationCategoryDAO) extends CardService with Logger {
 
   override def savePicture(fbID: String, cardID: String, fileName: String, fingerPrint: PictureFingerPrint): Future[Double] = {
+    log(s"Starts fetching category $cardID from the database...")
     validationCategoryDAO.find(cardID).map(_.get)
       .flatMap{ validationCategory =>
-        
+
+        log(s"Category $cardID fetched. Starts Computing the score...")
         val (score, newValidationCat) = ScoreComputing.computeScore(fingerPrint, validationCategory)
         val picture = Picture(fileName, score, fingerPrint)
 
+        log(s"Score computed. Saving $cardID category in the database...")
         validationCategoryDAO.save(newValidationCat).flatMap{_ =>
+          log(s"Category $cardID saved. Sending the score back.")
           cardDAO.savePicture(fbID, cardID, picture)
             .map(_ => score)
           }

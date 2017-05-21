@@ -2,7 +2,7 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 import utils.Logger
-import utils.DataVariables.pathToValidationImage
+import utils.DataVariables.{getValidationDescriptor, pathToValidationImage}
 
 case class ValidationCategory(
                                category: String,
@@ -21,7 +21,7 @@ case class ValidationCategory(
   }
   def computeSimilarites(descriptor: Descriptor): ValidationCategory = {
     val newValidationPictures = validationPictures.map{valPic =>
-      val similarity = Descriptor.fromImagePath(pathToValidationImage(category, valPic.fileName)).similarityWith(descriptor)
+      val similarity = getValidationDescriptor(category, valPic.fileName).similarityWith(descriptor)
       valPic.updateSimilarity(similarity)}
     val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore
     log(s"old similarities score: $similaritiesScore\n\t" +

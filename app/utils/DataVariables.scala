@@ -1,6 +1,9 @@
 package utils
 
+import models.Descriptor
 import utils.Files.ls
+
+import scala.collection.immutable.Queue
 
 
 object DataVariables extends Logger {
@@ -11,6 +14,25 @@ object DataVariables extends Logger {
   private val sampleDir = absolutePathToData + "sample/"
 
   lazy val categories: Set[String] = ls(validationDir).map(_.getName).toSet
+
+  private var cache: Queue[(String, Set[Descriptor])] = Queue.empty
+  private var cacheSize = 10
+  def getValidationDescriptors(category: String): Set[Descriptor] = {
+    cache.find( _._1 == category ).map(_._2).getOrElse{
+      if(cache.size < 10){
+        val descriptors = listValidationFileNames(category)
+          .map(fileName => Descriptor.fromImagePath(pathToValidationImage(category, fileName)))
+        cache = cache.enqueue(category -> descriptors)
+        descriptors
+      } else {
+        cache = cache.dequeue._2
+        getValidationDescriptors(category)
+      }
+    }
+  }
+  def getValidationDescriptor(category: String, fileName: String): Descriptor = {
+    getValidationDescriptors(category).find(_.fileName == fileName).get
+  }
 
   def listValidationFileNames(category: String): Set[String] =
     listFileNames(pathToValidationFolder(category))
@@ -27,10 +49,10 @@ object DataVariables extends Logger {
   def pathToImage(fbID: String, cardID: String, fileName: String): String =
     absolutePathToData + s"users/$fbID/$cardID/$fileName"
 
-  def pathToValidationFolder(category: String): String =
+  private def pathToValidationFolder(category: String): String =
     s"$validationDir$category/"
 
-  def pathToValidationImage(category: String, fileName: String): String =
+  private def pathToValidationImage(category: String, fileName: String): String =
     pathToValidationFolder(category) + fileName
 
   def pathToSampleFolder(category: String): String =

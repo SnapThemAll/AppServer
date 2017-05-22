@@ -11,7 +11,7 @@ case class ValidationCategory(
                                numberOfImprovements: Int
                              ) extends Logger {
 
-  val similaritiesScore: Float = validationPictures.map(_.highestSimilarity).sum
+  //val similaritiesScore: Float = validationPictures.map(_.highestSimilarity).sum
 
 
   def computeSimilarities(descriptors: Set[Descriptor]): ValidationCategory = {
@@ -28,11 +28,13 @@ case class ValidationCategory(
       }
       newValPic
     }
-    val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore
+    val newGain = newValidationPictures.map(_.highestSimilarity).sum - validationPictures.map(_.highestSimilarity).sum
     if(newGain < 0){
+      error("old" + validationPictures.toString + "\n\t" +
+        "new" + newValidationPictures.toString)
       error(s"#new = ${newValidationPictures.size}\n\t" +
         s"#old = ${validationPictures.size}")
-      error(s"old similarities score: $similaritiesScore\n\t" +
+      error(s"old similarities score: ${validationPictures.map(_.highestSimilarity).sum}\n\t" +
         s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
         s"new - old = $newGain")
     }
@@ -50,7 +52,7 @@ case class ValidationCategory(
   }
 
   def marginalGain(that: ValidationCategory): Float = {
-    this.similaritiesScore - that.similaritiesScore
+    this.validationPictures.map(_.highestSimilarity).sum - that.validationPictures.map(_.highestSimilarity).sum
   }
 }
 

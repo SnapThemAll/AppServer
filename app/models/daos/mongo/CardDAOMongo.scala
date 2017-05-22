@@ -25,11 +25,18 @@ class CardDAOMongo @Inject()(mongoDB: Mongo) extends CardDAO {
       _.find(Json.obj("fbID" -> fbID, "cardID" -> cardID)).one[Card]
     )
 
-  override def findAll(fbID: String): Future[Seq[Card]] =
+  override def findAll(): Future[Seq[Card]] =
+    cardColl.flatMap(
+      _.find(Json.obj())
+        .cursor[Card]()
+        .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAll in card dao"))
+    )
+
+  override def findAllCards(fbID: String): Future[Seq[Card]] =
     cardColl.flatMap(
       _.find(Json.obj("fbID" -> fbID))
         .cursor[Card]()
-        .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAll in card dao"))
+        .collect[Seq](-1, Mongo.cursonErrorHandler[Card]("findAllCards in card dao"))
     )
 
   override def findAllUsers(cardID: String): Future[Seq[Card]] =

@@ -19,5 +19,7 @@ trait CardService {
 
   def computeTotalScore(fbID: String): Future[Double]
 
+  def computeTotalScoreAllUsers(): Future[Seq[(String, Double)]]
+
   def removePicture(fbID: String, cardID: String, fileName: String): Future[Option[Card]]
 }

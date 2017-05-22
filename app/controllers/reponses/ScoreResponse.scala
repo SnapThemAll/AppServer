@@ -2,7 +2,10 @@ package controllers.reponses
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ScoreResponse(score: Double)
+case class ScoreResponse(
+                          score: Double,
+                          name: Option[String] = None
+                        )
 
 object ScoreResponse {
 

@@ -12,6 +12,7 @@ GET     /authenticate/token/:provider   controllers.SocialAuth.authenticateToken
 
 #GET GAME DATA
 GET     /getlevels                      controllers.GameController.getLevels
+GET     /getworldusers               controllers.CardController.getAllScores
 
 #GET CARD DATA
 GET     /getpic/:cardName/:fileName     controllers.CardController.getPicture(cardName, fileName)

@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import computing.ScoreComputing
 import models._
-import models.daos.{CardDAO, ValidationCategoryDAO}
+import models.daos.{CardDAO, UserDAO, ValidationCategoryDAO}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import utils.Logger
 
@@ -16,7 +16,11 @@ import scala.concurrent.Future
   * @param cardDAO The card DAO implementation.
   * @param validationCategoryDAO The validationCategory DAO implementation
   */
-class CardServiceImpl @Inject()(cardDAO: CardDAO, validationCategoryDAO: ValidationCategoryDAO) extends CardService with Logger {
+class CardServiceImpl @Inject()(
+                                 cardDAO: CardDAO,
+                                 userDAO: UserDAO,
+                                 validationCategoryDAO: ValidationCategoryDAO
+                               ) extends CardService with Logger {
 
   override def savePicture(fbID: String, cardID: String, fileName: String, descriptor: Descriptor): Future[Double] = {
     log(s"Starts fetching category $cardID from the database...")
@@ -32,8 +36,8 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO, validationCategoryDAO: Validat
           log(s"Category $cardID saved. Sending the score back.")
           cardDAO.savePicture(fbID, cardID, picture)
             .map(_ => score)
-          }
         }
+      }
   }
 
   override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {
@@ -49,15 +53,30 @@ class CardServiceImpl @Inject()(cardDAO: CardDAO, validationCategoryDAO: Validat
   }
 
   override def retrieveAll(fbID: String): Future[Seq[Card]] = {
-    cardDAO.findAll(fbID).map{ cards =>
+    cardDAO.findAllCards(fbID).map{ cards =>
       cards.map(_.getNotDeleted).filter(_.pictures.nonEmpty)
     }
   }
 
   override def computeTotalScore(fbID: String): Future[Double] = {
-    retrieveAll(fbID)
+    cardDAO.findAllCards(fbID)
       .map{ cards =>
         cards.map(_.bestScore).sum
+      }
+  }
+
+  override def computeTotalScoreAllUsers(): Future[Seq[(String, Double)]] = {
+//    cardDAO.findAll().map{ allCards =>
+//      allCards
+//        .groupBy(_.fbID)
+//        .map{ case(fbID, cards) => fbID -> cards.map(_.bestScore).sum }
+//    }
+    userDAO.findAll()
+      .flatMap{ users =>
+        Future.sequence(
+          users
+            .map{ user => computeTotalScore(user.loginInfo.providerID).map(score => user.name.getOrElse("No Name") -> score) }
+        )
       }
   }
 

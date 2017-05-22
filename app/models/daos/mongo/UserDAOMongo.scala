@@ -30,7 +30,7 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
     */
   override def find(loginInfo: LoginInfo): Future[Option[User]] =
     userColl.flatMap(
-        _.find(Json.obj("loginInfo" -> loginInfo)).one[User]
+      _.find(Json.obj("loginInfo" -> loginInfo)).one[User]
     )
 
   /**
@@ -40,8 +40,15 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
     * @return The found user or None if no user for the given ID could be found.
     */
   override def find(userID: UUID): Future[Option[User]] = userColl.flatMap(
-      _.find(Json.obj("userID" -> userID)).one[User]
+    _.find(Json.obj("userID" -> userID)).one[User]
   )
+
+  override def findAll(): Future[Seq[User]] =
+    userColl.flatMap(
+      _.find(Json.obj())
+        .cursor[User]()
+        .collect[Seq](-1, Mongo.cursonErrorHandler[User]("findAll in user dao"))
+    )
 
   /**
     * Saves a user.
@@ -54,8 +61,8 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
     userColl
       .flatMap(_.update(Json.obj("loginInfo" -> user.loginInfo), user, upsert = true))
       .transform(
-          _ => user,
-          t => t
+        _ => user,
+        t => t
       )
   }
 
@@ -69,8 +76,8 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
     userColl
       .flatMap(_.remove(Json.obj("userID" -> id)))
       .transform(
-          _ => (),
-          t => t
+        _ => (),
+        t => t
       )
 
   /**
@@ -83,15 +90,15 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
     userColl
       .flatMap(_.remove(Json.obj("loginInfo" -> loginInfo)))
       .transform(
-          _ => (),
-          t => t //TODO check the error and throw another more meaningfull error (e.g. NoSuchElement...)
+        _ => (),
+        t => t //TODO check the error and throw another more meaningfull error (e.g. NoSuchElement...)
       )
 
   private[daos] def dropAll =
     userColl
       .flatMap(_.remove(Json.obj()))
       .transform(
-          _ => (),
-          t => t
+        _ => (),
+        t => t
       )
 }

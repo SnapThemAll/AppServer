@@ -115,4 +115,20 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     }
 
 
+  def getAllScores: Action[AnyContent] =
+    silhouette.UserAwareAction.async { implicit request =>
+      verifyAuthentication(request) { identity =>
+        cardService.computeTotalScoreAllUsers()
+          .map{ namesAndScore =>
+            Ok(
+              Json.toJson(
+                namesAndScore.map{ case (name, score) =>
+                  ScoreResponse(score, Some(name))
+                }
+              )
+            )
+          }
+      }.recover(recoverFromInternalServerError)
+    }
+
 }

@@ -25,9 +25,9 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
       if(categoriesToCompute.isEmpty){
         Future.successful(log("Database is already setup"))
       } else {
-        log("Setting up database")
+        log("Updating database")
         setupValidationCategories(categoriesToCompute, validationCategoryDAO)
-          .map(numCat => log(s"Database set up (with $numCat categories)"))
+          .map(numCategoriesUpdated => log(s"Database updated (with $numCategoriesUpdated new categories)"))
       }
 
     }

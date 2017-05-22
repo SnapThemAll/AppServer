@@ -30,6 +30,8 @@ case class ValidationCategory(
     }
     val newGain = newValidationPictures.map(_.highestSimilarity).sum - this.similaritiesScore
     if(newGain < 0){
+      error(s"#new = ${newValidationPictures.size}\n\t" +
+        s"#old = ${validationPictures.size}")
       error(s"old similarities score: $similaritiesScore\n\t" +
         s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
         s"new - old = $newGain")

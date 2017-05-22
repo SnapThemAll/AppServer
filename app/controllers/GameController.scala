@@ -27,5 +27,4 @@ class GameController @Inject()(silhouette: Silhouette[DefaultEnv]) extends Contr
         }
       }.recover(recoverFromInternalServerError)
     }
-
 }

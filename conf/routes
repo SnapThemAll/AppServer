@@ -11,8 +11,8 @@ GET     /authenticate/:provider         controllers.SocialAuth.authenticate(prov
 GET     /authenticate/token/:provider   controllers.SocialAuth.authenticateToken(provider)
 
 #GET GAME DATA
-GET     /getlevels                      controllers.GameController.getLevels
-GET     /getworldusers               controllers.CardController.getAllScores
+#GET     /getlevels                      controllers.GameController.getLevels
+GET     /getworldusers                  controllers.CardController.getAllScores
 
 #GET CARD DATA
 GET     /getpic/:cardName/:fileName     controllers.CardController.getPicture(cardName, fileName)
@@ -22,3 +22,6 @@ GET     /getscore/:fbID                 controllers.CardController.getScore(fbID
 #ADD/REMOVE CARD DATA
 POST    /uploadpic/:cardName            controllers.CardController.uploadPicture(cardName)
 GET     /removepic/:cardName/:fileName  controllers.CardController.removePicture(cardName, fileName)
+
+#UX
+POST    /uploadfeedback                 controllers.UXController.uploadFeedback

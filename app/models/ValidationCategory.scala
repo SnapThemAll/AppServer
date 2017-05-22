@@ -1,8 +1,8 @@
 package models
 
 import play.api.libs.json.{Json, OFormat}
+import utils.DataVariables.getValidationDescriptor
 import utils.Logger
-import utils.DataVariables.{getValidationDescriptor, pathToValidationImage}
 
 case class ValidationCategory(
                                category: String,
@@ -11,7 +11,7 @@ case class ValidationCategory(
                                numberOfImprovements: Int
                              ) extends Logger {
 
-  //val similaritiesScore: Float = validationPictures.map(_.highestSimilarity).sum
+  val similaritiesScore: Float = validationPictures.aggregate(0f)( _ + _.highestSimilarity, _ + _ )
 
 
   def computeSimilarities(descriptors: Set[Descriptor]): ValidationCategory = {
@@ -28,15 +28,10 @@ case class ValidationCategory(
       }
       newValPic
     }
-    val newGain = newValidationPictures.map(_.highestSimilarity).sum - validationPictures.map(_.highestSimilarity).sum
+    val newGain = newValidationPictures.aggregate(0f)( _ + _.highestSimilarity, _ + _ ) - similaritiesScore
+
     if(newGain < 0){
-      error("old" + validationPictures.toString + "\n\t" +
-        "new" + newValidationPictures.toString)
-      error(s"#new = ${newValidationPictures.size}\n\t" +
-        s"#old = ${validationPictures.size}")
-      error(s"old similarities score: ${validationPictures.map(_.highestSimilarity).sum}\n\t" +
-        s"new similarities score: ${newValidationPictures.map(_.highestSimilarity).sum}\n\t" +
-        s"new - old = $newGain")
+      error("newGain < 0 - THIS SHOULD NEVER HAPPEN")
     }
     val newAverageGain = // WE SHOULD ONLY UPDATE AVERAGE GAIN IF THERE'S AN IMPROVEMENT
       if(newGain > 0) {
@@ -52,7 +47,7 @@ case class ValidationCategory(
   }
 
   def marginalGain(that: ValidationCategory): Float = {
-    this.validationPictures.map(_.highestSimilarity).sum - that.validationPictures.map(_.highestSimilarity).sum
+    this.similaritiesScore - that.similaritiesScore
   }
 }
 

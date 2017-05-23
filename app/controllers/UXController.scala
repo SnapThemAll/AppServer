@@ -1,20 +1,12 @@
 package controllers
 
-import java.io.File
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
-import controllers.reponses.{PictureDataResponse, PictureUploadResponse, ScoreResponse}
-import models.Descriptor
-import models.services.{CardService, FeedbackService}
-import play.api.libs.Files
+import models.services.FeedbackService
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
-import utils.DataVariables
+import play.api.mvc.{Action, Controller}
 import utils.auth.DefaultEnv
-
-import scala.concurrent.Future
 
 /**
   * Class that handles the request related to a card

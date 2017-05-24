@@ -32,13 +32,13 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
           .map(numCategoriesUpdated => log(s"Database updated (with $numCategoriesUpdated new categories)"))
       }
     }
-    .foreach{_ =>
-      categories.foreach( category =>
-        if(!cacheIsFull){
-          getValidationDescriptors(category)
-        }
-      )
-    }
+//    .foreach{_ =>
+//      categories.foreach( category =>
+//        if(!cacheIsFull){
+//          getValidationDescriptors(category)
+//        }
+//      )
+//    }
 
   private def percentage(percent: Int): Float = percent / 100f
 

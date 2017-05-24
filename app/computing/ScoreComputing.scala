@@ -14,7 +14,7 @@ object ScoreComputing extends Logger {
 
     log(s"Category ${validationCategory.category} improved by $marginalGain} (the bigger the better). Score: $score")
 
-    score -> updatedValidationCategory
+    Math.min(score * 5, 10f) -> updatedValidationCategory
   }
 
 }

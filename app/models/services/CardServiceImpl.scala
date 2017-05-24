@@ -61,7 +61,7 @@ class CardServiceImpl @Inject()(
   override def computeTotalScore(fbID: String): Future[Double] = {
     cardDAO.findAllCards(fbID)
       .map{ cards =>
-        cards.map(_.bestScore).sum
+        cards.map(_.totalScore).sum
       }
   }
 

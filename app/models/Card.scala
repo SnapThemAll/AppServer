@@ -15,7 +15,7 @@ case class Card(cardID: String,
 
   private def picturePath(fileName: String): String = DataVariables.pathToImage(fbID, cardID, fileName)
 
-  def bestScore: Double = pictures.filterNot(_.deleted).map(_.score).max
+  def totalScore: Double = pictures.filterNot(_.deleted).map(_.score).sum
 
   def updatePicture(picture: Picture): Card =
     this.copy(

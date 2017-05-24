@@ -3,10 +3,10 @@ package models.daos
 import com.google.inject.{Inject, Singleton}
 import models.{Descriptor, ValidationCategory}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import utils.DataVariables.{categories, cacheIsFull, getValidationDescriptors}
 import utils.Logger
 
 import scala.concurrent.Future
-import utils.DataVariables.categories
 
 @Singleton
 class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logger {
@@ -21,22 +21,29 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
       }
   } .map(_.filter(_._2))
     .map(_.map(_._1))
-    .foreach{ categoriesToCompute =>
+    .map{ categoriesToCompute =>
       if(categoriesToCompute.isEmpty){
-        Future.successful(log("Database is already setup"))
+        Future.successful {
+          log("Database is already setup")
+        }
       } else {
         log("Updating database")
         setupValidationCategories(categoriesToCompute, validationCategoryDAO)
           .map(numCategoriesUpdated => log(s"Database updated (with $numCategoriesUpdated new categories)"))
       }
-
+    }
+    .foreach{_ =>
+      categories.foreach( category =>
+        if(!cacheIsFull){
+          getValidationDescriptors(category)
+        }
+      )
     }
 
   private def percentage(percent: Int): Float = percent / 100f
 
-
   private def setupValidationCategories(categoriesToCompute: Set[String], validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
-    import utils.DataVariables.{listValidationFileNames, listSampleFileNames, pathToSampleImage}
+    import utils.DataVariables.{listSampleFileNames, listValidationFileNames, pathToSampleImage}
 
     Future.sequence {
       categoriesToCompute.toList.map{ catName =>

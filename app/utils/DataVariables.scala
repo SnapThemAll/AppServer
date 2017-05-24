@@ -17,6 +17,7 @@ object DataVariables extends Logger {
 
   private var cache: Queue[(String, Set[Descriptor])] = Queue.empty
   private var cacheSize = 60
+  def cacheIsFull: Boolean = !(cache.size < cacheSize)
   def getValidationDescriptors(category: String): Set[Descriptor] = {
     cache.find( _._1 == category ).map(_._2).getOrElse{
       if(cache.size <= cacheSize){

@@ -42,17 +42,28 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
           if(descriptor.descriptorMatrix.rows < 100) {
             log(s"Unprocessable entity: Quality of the image is too low (${descriptor.descriptorMatrix.rows} features)")
             Future.successful(
-              UnprocessableEntity("Quality of the image is too low")
+              Forbidden("Quality of the image is too low")
             )
           } else {
-            cardService.savePicture(uuid, cardID, fileName, descriptor)
-              .map{ score =>
-                val pictureFolderURI = DataVariables.pathToFolder(uuid, cardID)
-                val pictureFile = new File(pictureFolderURI + fileName)
-                new File(pictureFolderURI).mkdirs()
-                picture.ref.moveTo(pictureFile)
-                Ok(Json.toJson(PictureUploadResponse(score)))
+            cardService.retrieve(uuid, cardID)
+              .map(optCard => optCard.isEmpty || optCard.get.getNotDeleted.pictures.length < 10)
+              .flatMap{ canUpload =>
+                if(canUpload){
+                  cardService.savePicture(uuid, cardID, fileName, descriptor)
+                    .map{ score =>
+                      val pictureFolderURI = DataVariables.pathToFolder(uuid, cardID)
+                      val pictureFile = new File(pictureFolderURI + fileName)
+                      new File(pictureFolderURI).mkdirs()
+                      picture.ref.moveTo(pictureFile)
+                      Ok(Json.toJson(PictureUploadResponse(score)))
+                    }
+                } else {
+                  Future.successful(
+                    Forbidden("You already have 10 pictures on the server")
+                  )
+                }
               }
+
           }
 
         }.getOrElse{

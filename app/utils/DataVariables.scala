@@ -12,8 +12,9 @@ object DataVariables extends Logger {
 
   private val validationDir = absolutePathToData + "validation/"
   private val sampleDir = absolutePathToData + "sample/"
+  private val clutterDir = absolutePathToData + "clutter/"
 
-  lazy val categories: Set[String] = ls(validationDir).map(_.getName).toSet
+  val categories: Set[String] = ls(validationDir).map(_.getName).toSet
 
   private var cache: Queue[(String, Set[Descriptor])] = Queue.empty
   private var cacheSize = 60
@@ -31,8 +32,13 @@ object DataVariables extends Logger {
       }
     }
   }
+
   def getValidationDescriptor(category: String, fileName: String): Descriptor = {
     getValidationDescriptors(category).find(_.fileName == fileName).get
+  }
+
+  def computeClutterDescriptors: Set[Descriptor] = {
+    ls(clutterDir).map(Descriptor.fromImageFile).toSet
   }
 
   def listValidationFileNames(category: String): Set[String] =

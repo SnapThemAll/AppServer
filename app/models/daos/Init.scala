@@ -3,7 +3,7 @@ package models.daos
 import com.google.inject.{Inject, Singleton}
 import models.{Descriptor, ValidationCategory}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import utils.DataVariables.{categories, cacheIsFull, getValidationDescriptors}
+import utils.DataVariables.{categories, computeClutterDescriptors}
 import utils.Logger
 
 import scala.concurrent.Future
@@ -45,30 +45,39 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
   private def setupValidationCategories(categoriesToCompute: Set[String], validationCategoryDAO: ValidationCategoryDAO): Future[Int] = {
     import utils.DataVariables.{listSampleFileNames, listValidationFileNames, pathToSampleImage}
 
+    log(s"Computing clutter descriptors...")
+    val (fewClutter, mostClutter) = computeClutterDescriptors.splitAt(20)
+    log(s"DONE")
+
     Future.sequence {
       categoriesToCompute.toList.map{ catName =>
         log(s"Creating validation category $catName...")
         var validationCategory = ValidationCategory.initFromCategory(catName, listValidationFileNames(catName))
         log("DONE")
+
         log(s"Computing sample descriptors of category $catName...")
         val sampleDescriptors = listSampleFileNames(catName).map(fileName => Descriptor.fromImagePath(pathToSampleImage(catName, fileName)))
         log("DONE")
 
-        val splitIndex = Math.round(sampleDescriptors.size * percentage(65) )
-        val (beforeUserDescriptors, fakeUserDescriptors) = sampleDescriptors.splitAt(splitIndex)
 
-        log(s"Adding before user descriptors to validation category $catName")
+        log(s"Adding most clutter descriptors to validation category $catName")
         validationCategory = validationCategory
-          .computeSimilarities(beforeUserDescriptors)
+          .computeSimilarities(mostClutter)
           .copy(averageGain = 0f, numberOfImprovements = 0)
         log("DONE")
 
-        log(s"Adding fake user descriptors to validation category $catName")
+        log(s"Adding few clutter descriptors to validation category $catName")
         validationCategory = validationCategory
-          .computeSimilarities(fakeUserDescriptors)
+          .computeSimilarities(fewClutter)
         log("DONE")
 
-        validationCategoryDAO.save(validationCategory).map(_ => true)
+        log(s"Adding sample descriptors to validation category $catName")
+        validationCategory = validationCategory
+          .computeSimilarities(sampleDescriptors)
+        log("DONE")
+
+        validationCategoryDAO.save(validationCategory)
+          .map(_ => true)
       }
     }.map(_.size)
   }

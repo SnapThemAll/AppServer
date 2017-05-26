@@ -3,7 +3,7 @@ package models.daos
 import com.google.inject.{Inject, Singleton}
 import models.{Descriptor, ValidationCategory}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import utils.DataVariables.{categories, computeClutterDescriptors}
+import utils.DataVariables.{categories, computeClutterDescriptors, cacheIsFull, getValidationDescriptors}
 import utils.Logger
 
 import scala.concurrent.Future
@@ -32,13 +32,13 @@ class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logg
           .map(numCategoriesUpdated => log(s"Database updated (with $numCategoriesUpdated new categories)"))
       }
     }
-//    .foreach{_ =>
-//      categories.foreach( category =>
-//        if(!cacheIsFull){
-//          getValidationDescriptors(category)
-//        }
-//      )
-//    }
+    .foreach{_ =>
+      categories.foreach( category =>
+        if(!cacheIsFull){
+          getValidationDescriptors(category)
+        }
+      )
+    }
 
   private def percentage(percent: Int): Float = percent / 100f
 

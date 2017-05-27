@@ -51,7 +51,7 @@ class CardController @Inject()(
             )
           } else {
             cardService.retrieve(uuid, cardID)
-              .map(optCard => optCard.isEmpty || optCard.get.getNotDeleted.pictures.length < 10)
+              .map(optCard => optCard.isEmpty || optCard.get.getNotDeleted.pictures.length < 5)
               .flatMap{ canUpload =>
                 if(canUpload){
                   cardService.savePicture(uuid, cardID, fileName, descriptor)
@@ -64,7 +64,7 @@ class CardController @Inject()(
                     }
                 } else {
                   Future.successful(
-                    Forbidden("You already have 10 pictures on the server")
+                    Forbidden("You already have 5 pictures on the server")
                   )
                 }
               }

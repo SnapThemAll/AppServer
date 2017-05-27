@@ -13,10 +13,6 @@ class Init @Inject() (updateDAO: UpdateDAO, validationCategoryDAO: ValidationCat
 
   log("Checking if init is needed")
 
-  updateDAO.save(
-    Update("1.0", serverIsUpdating = false)
-  )
-
   Future.sequence{
     categories
       .map { category =>

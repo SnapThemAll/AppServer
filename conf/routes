@@ -32,6 +32,8 @@ POST    /:ver/uploadfeedback                controllers.UXController.uploadFeedb
 
 
 ## OLD VERSION
+
+GET     /:ver/authenticate/token/:provider  controllers.SocialAuth.authenticateToken(provider)
 #GET GAME DATA
 #GET     /getlevels                         controllers.GameController.getLevels
 GET     /getworldusers                      controllers.CardController.getAllScores(appVersion ?= "outOfDate")

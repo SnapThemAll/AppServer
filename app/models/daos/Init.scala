@@ -9,7 +9,7 @@ import utils.Logger
 import scala.concurrent.Future
 
 @Singleton
-class Init @Inject() (messageDAO: MessageDAO, validationCategoryDAO: ValidationCategoryDAO) extends Logger {
+class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logger {
 
   log("Init starting...")
 

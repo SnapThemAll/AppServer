@@ -3,12 +3,12 @@
 # ~~~~
 
 # Home page
-GET     /                                   controllers.Application.index
-GET     /isauthenticated                    controllers.Application.isAuthenticated
-GET     /signout                            controllers.Application.signOut
+GET     /:ver                               controllers.Application.index
+GET     /:ver/isauthenticated               controllers.Application.isAuthenticated
+GET     /:ver/signout                       controllers.Application.signOut
 
-GET     /authenticate/:provider             controllers.SocialAuth.authenticate(provider)
-GET     /authenticate/token/:provider       controllers.SocialAuth.authenticateToken(provider)
+GET     /:ver/authenticate/:provider        controllers.SocialAuth.authenticate(provider)
+GET     /:ver/authenticate/token/:provider  controllers.SocialAuth.authenticateToken(provider)
 
 #GET GAME DATA
 #GET     /getlevels                         controllers.GameController.getLevels
@@ -32,8 +32,7 @@ POST    /:ver/uploadfeedback                controllers.UXController.uploadFeedb
 
 
 ## OLD VERSION
-
-GET     /:ver/authenticate/token/:provider  controllers.SocialAuth.authenticateToken(provider)
+GET     /authenticate/token/:provider       controllers.SocialAuth.authenticateToken(provider)
 #GET GAME DATA
 #GET     /getlevels                         controllers.GameController.getLevels
 GET     /getworldusers                      controllers.CardController.getAllScores(appVersion ?= "outOfDate")

@@ -31,12 +31,20 @@ case class User(userID: UUID,
     *
     * @return Maybe a name.
     */
-  def name =
+  lazy val name =
     firstName -> lastName match {
       case (Some(f), Some(l)) => Some(f + " " + l)
       case (Some(f), None)    => Some(f)
       case (None, Some(l))    => Some(l)
       case _                  => None
+    }
+
+  lazy val anonymousName =
+    firstName -> lastName match {
+      case (Some(f), Some(l)) => s"$f ${l.head}."
+      case (Some(f), None)    => s"$f X"
+      case (None, Some(l))    => s"Mr(s) $l"
+      case _                  => "Anonymous"
     }
 }
 

@@ -3,12 +3,12 @@
 # ~~~~
 
 # Home page
-GET     /:ver                               controllers.Application.index
-GET     /:ver/isauthenticated               controllers.Application.isAuthenticated
-GET     /:ver/signout                       controllers.Application.signOut
+GET     /v1.0                               controllers.Application.index
+GET     /v1.0/isauthenticated               controllers.Application.isAuthenticated
+GET     /v1.0/signout                       controllers.Application.signOut
 
-GET     /:ver/authenticate/:provider        controllers.SocialAuth.authenticate(provider)
-GET     /:ver/authenticate/token/:provider  controllers.SocialAuth.authenticateToken(provider)
+GET     /v1.0/authenticate/:provider        controllers.SocialAuth.authenticate(provider)
+GET     /v1.0/authenticate/token/:provider  controllers.SocialAuth.authenticateToken(provider)
 
 #GET GAME DATA
 #GET     /getlevels                         controllers.GameController.getLevels

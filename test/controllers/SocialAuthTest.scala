@@ -45,7 +45,7 @@ class SocialAuthTest extends PlaySpec with OAuth2Constants with Logger with With
       )
 
       val user     = contentAsJson(result).as[User]
-      val userInDB = await(dao.find(user.userID)).get
+      val userInDB = await(dao.find(user._id)).get
 
       status(result) shouldBe OK
       user shouldBe userInDB

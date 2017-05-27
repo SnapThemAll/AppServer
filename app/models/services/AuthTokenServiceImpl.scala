@@ -52,7 +52,7 @@ class AuthTokenServiceImpl @Inject()(authTokenDAO: AuthTokenDAO, clock: Clock) e
   def clean = authTokenDAO.findExpired(clock.now.withZone(DateTimeZone.UTC)).flatMap { tokens =>
     Future.sequence(
         tokens.map { token =>
-          authTokenDAO.remove(token.id).map(_ => token)
+          authTokenDAO.remove(token._id).map(_ => token)
         }
     )
   }

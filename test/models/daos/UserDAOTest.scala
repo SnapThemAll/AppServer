@@ -34,7 +34,7 @@ class UserDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
     }
     "retrieves added user using userID" in new WithDAO[UserDAO]("save_and_retrieve_user_with_id") {
       await(dao.save(user))
-      val userFound = await(dao.find(user.userID))
+      val userFound = await(dao.find(user._id))
       userFound shouldBe defined
       userFound.get shouldBe user
     }
@@ -46,8 +46,8 @@ class UserDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
     }
     "not retrieves a removed user (using userID)" in new WithDAO[UserDAO]("save_remove_retrieve_user_with_id") {
       await(dao.save(user))
-      await(dao.remove(user.userID))
-      val userFound = await(dao.find(user.userID))
+      await(dao.remove(user._id))
+      val userFound = await(dao.find(user._id))
       userFound shouldBe None
     }
     "not retrieves a removed user (using loginInfo)" in new WithDAO[UserDAO]("save_remove_retrieve_user_with_id") {
@@ -60,7 +60,7 @@ class UserDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeout {
       await(dao.save(user))
       await(dao.save(user2))
       await(dao.dropAll)
-      val userFound = await(dao.find(user.userID))
+      val userFound = await(dao.find(user._id))
       val userFound2 = await(dao.find(user2.loginInfo))
       userFound shouldBe None
       userFound2 shouldBe None

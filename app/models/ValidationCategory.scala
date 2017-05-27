@@ -1,5 +1,7 @@
 package models
 
+import java.util.UUID
+
 import play.api.libs.json.{Json, OFormat}
 import utils.DataVariables.getValidationDescriptor
 import utils.Logger
@@ -8,7 +10,8 @@ case class ValidationCategory(
                                category: String,
                                validationPictures: Set[ValidationPicture],
                                averageGain: Float,
-                               numberOfImprovements: Int
+                               numberOfImprovements: Int,
+                               _id: UUID = UUID.randomUUID()
                              ) extends Logger {
 
   val similaritiesScore: Float = validationPictures.aggregate(0f)( _ + _.highestSimilarity, _ + _ )

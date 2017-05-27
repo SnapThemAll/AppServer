@@ -33,7 +33,7 @@ class AuthTokenDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeo
     "retrieves a valid token" in new WithDAO[AuthTokenDAO]("auth_token_save_and_retrieve")  {
       val validAuthToken = saveAuthToken(dao)
 
-      val tokenFound = await(dao.find(validAuthToken.id))
+      val tokenFound = await(dao.find(validAuthToken._id))
       tokenFound shouldBe defined
       tokenFound.get shouldBe validAuthToken
     }
@@ -47,15 +47,15 @@ class AuthTokenDAOTest extends PlaySpec with FutureAwaits with DefaultAwaitTimeo
     "not retrieves removed token" in new WithDAO[AuthTokenDAO]("auth_token_save_and_try_retrieving_removed")  {
       val validAuthToken = saveAuthToken(dao)
 
-      await(dao.remove(validAuthToken.id))
-      val tokenFound = await(dao.find(validAuthToken.id))
+      await(dao.remove(validAuthToken._id))
+      val tokenFound = await(dao.find(validAuthToken._id))
       tokenFound shouldBe None
     }
     "not retrieves tokens if dropAll was called" in new WithDAO[AuthTokenDAO]("auth_token_save_and_try_retrieving_removed")  {
       val validAuthToken = saveAuthToken(dao)
 
       await(dao.dropAll)
-      val tokenFound = await(dao.find(validAuthToken.id))
+      val tokenFound = await(dao.find(validAuthToken._id))
       tokenFound shouldBe None
     }
   }

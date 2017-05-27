@@ -36,11 +36,11 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
   /**
     * Finds a user by its user ID.
     *
-    * @param userID The ID of the user to find.
+    * @param _id The ID of the user to find.
     * @return The found user or None if no user for the given ID could be found.
     */
-  override def find(userID: UUID): Future[Option[User]] = userColl.flatMap(
-    _.find(Json.obj("userID" -> userID)).one[User]
+  override def find(_id: UUID): Future[Option[User]] = userColl.flatMap(
+    _.find(Json.obj("_id" -> _id)).one[User]
   )
 
   override def findAll(): Future[Seq[User]] =
@@ -69,12 +69,12 @@ class UserDAOMongo @Inject()(mongoDB: Mongo) extends UserDAO {
   /**
     * Removes the user for the given ID.
     *
-    * @param id The ID for which the token should be removed.
+    * @param _id The ID for which the user should be removed.
     * @return A future to wait for the process to be completed.
     */
-  override def remove(id: UUID): Future[Unit] =
+  override def remove(_id: UUID): Future[Unit] =
     userColl
-      .flatMap(_.remove(Json.obj("userID" -> id)))
+      .flatMap(_.remove(Json.obj("_id" -> _id)))
       .transform(
         _ => (),
         t => t

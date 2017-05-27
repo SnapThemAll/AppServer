@@ -1,5 +1,7 @@
 package models
 
+import java.util.UUID
+
 import play.api.libs.json.{Json, OFormat}
 import utils.DataVariables
 
@@ -10,7 +12,8 @@ import utils.DataVariables
   */
 case class Card(cardID: String,
                 fbID: String,
-                pictures: IndexedSeq[Picture] = IndexedSeq.empty
+                pictures: IndexedSeq[Picture] = IndexedSeq.empty,
+                _id: UUID = UUID.randomUUID()
                ) {
 
   private def picturePath(fileName: String): String = DataVariables.pathToImage(fbID, cardID, fileName)

@@ -13,23 +13,6 @@ class Init @Inject() (messageDAO: MessageDAO, validationCategoryDAO: ValidationC
 
   log("Init starting...")
 
-  messageDAO.save(
-    Message(
-
-      serverIsUpdating = "Server is being updated... " +
-        "You can still take snaps. " +
-        "Then to compute their score at the same time, go to the 'Settings' tab.",
-
-      appIsOutOfDate = "You need to update the app to get your score. " +
-        "New features and better scoring is waiting for you :)",
-
-      latestNews = "We are working on improving the scoring of your snaps.",
-
-      latestVersion = "1.0.5"
-
-    )
-  )
-
   Future.sequence{
     categories
       .map { category =>

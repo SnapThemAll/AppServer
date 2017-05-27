@@ -14,6 +14,7 @@ import scala.concurrent.Future
 class GameController @Inject()(controllerUtils: ControllerUtils, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   import controllerUtils._
+
   val pathToFile: String = DataVariables.absolutePathToData + "levels.json"
 
   def getLevels(appVersion: String): Action[AnyContent] =
@@ -31,7 +32,16 @@ class GameController @Inject()(controllerUtils: ControllerUtils, silhouette: Sil
   def getNews(appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(appVersion)(request) { identity =>
+        getMessage
+          .map(msg => Ok(msg.latestNews))
+      }
+    }
 
+  def getVersion(appVersion: String): Action[AnyContent] =
+    silhouette.UserAwareAction.async { implicit request =>
+      verifyAuthentication(appVersion)(request) { identity =>
+        getMessage
+          .map(msg => Ok(msg.latestVersion))
       }
     }
 }

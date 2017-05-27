@@ -30,7 +30,7 @@ class UpdateDAOMongo @Inject()(mongoDB: Mongo) extends UpdateDAO {
       )
   }
 
-  override def find(): Future[Option[Update]] = {
+  override def find: Future[Option[Update]] = {
     updateColl.flatMap(
       _.find(Json.obj("uuid" -> "default")).one[Update]
     )

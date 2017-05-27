@@ -1,7 +1,7 @@
 package models.daos
 
 import com.google.inject.{Inject, Singleton}
-import models.{Descriptor, Update, ValidationCategory}
+import models.{Descriptor, Message, Update, ValidationCategory}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import utils.DataVariables.{cacheIsFull, categories, computeClutterDescriptors, getValidationDescriptors}
 import utils.Logger
@@ -9,9 +9,26 @@ import utils.Logger
 import scala.concurrent.Future
 
 @Singleton
-class Init @Inject() (updateDAO: UpdateDAO, validationCategoryDAO: ValidationCategoryDAO) extends Logger {
+class Init @Inject() (messageDAO: MessageDAO, validationCategoryDAO: ValidationCategoryDAO) extends Logger {
 
-  log("Checking if init is needed")
+  log("Init starting...")
+
+  messageDAO.save(
+    Message(
+
+      serverIsUpdating = "Server is being updated... " +
+        "You can still take snaps. " +
+        "Then to compute their score at the same time, go to the 'Settings' tab.",
+
+      appIsOutOfDate = "You need to update the app to get your score. " +
+        "New features and better scoring is waiting for you :)",
+
+      latestNews = "We are working on improving the scoring of your snaps.",
+
+      latestVersion = "1.0.5"
+
+    )
+  )
 
   Future.sequence{
     categories

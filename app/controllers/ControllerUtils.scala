@@ -2,8 +2,9 @@ package controllers
 
 import com.google.inject.Inject
 import com.mohiva.play.silhouette.api.actions.UserAwareRequest
+import models.Message
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import models.services.UpdateService
+import models.services.{MessageService, UpdateService}
 import utils.Logger
 import utils.auth.DefaultEnv
 
@@ -11,7 +12,7 @@ import scala.concurrent.Future
 import play.api.mvc.Result
 import play.api.mvc.Results._
 
-class ControllerUtils @Inject()(updateService: UpdateService) extends Logger {
+class ControllerUtils @Inject()(updateService: UpdateService, messageService: MessageService) extends Logger {
 
   def verifyAuthentication[T](appVersion: String)(request: => UserAwareRequest[DefaultEnv, T])(
     whatToDo: => (DefaultEnv#I => Future[Result])): Future[Result] = {
@@ -25,19 +26,13 @@ class ControllerUtils @Inject()(updateService: UpdateService) extends Logger {
           )
         ).flatMap {
           case true :: tail => // APP IS OUT OF DATE
-            Future.successful(
-              Forbidden(
-                "You need to update the app to get your score. " +
-                  "New features and better scoring is waiting for you :)")
-            )
+            messageService.get
+              .map(msg => Forbidden(msg.appIsOutOfDate))
 
           case false :: true :: Nil => // SERVER IS UPDATING
-            Future.successful(
-              Forbidden(
-                "Server is being updated... " +
-                  "You can still take snaps. " +
-                  "Then to compute their score at the same time, go to the 'Settings' tab.")
-            )
+            messageService.get
+              .map(msg => Forbidden(msg.serverIsUpdating))
+
           case _ => //EVERYTHING IS FINE
             whatToDo(identity)
         }
@@ -64,4 +59,6 @@ class ControllerUtils @Inject()(updateService: UpdateService) extends Logger {
       error("Error while answering a request", t)
       InternalServerError("An internal server error occurred. We are working on it.")
     }
+
+  def getMessage: Future[Message] = messageService.get
 }

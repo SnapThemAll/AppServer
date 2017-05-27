@@ -11,7 +11,7 @@ import play.api.libs.Files
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
-import utils.DataVariables
+import utils.{DataVariables, Logger}
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -21,15 +21,20 @@ import scala.concurrent.Future
   *
   * Check conf.routes to see what URL to use for your requests
   */
-class CardController @Inject()(cardService: CardService, silhouette: Silhouette[DefaultEnv]) extends Controller {
+class CardController @Inject()(
+                                controllerUtils: ControllerUtils,
+                                cardService: CardService,
+                                silhouette: Silhouette[DefaultEnv]
+                              ) extends Controller with Logger {
 
-  import Utils._
+  import controllerUtils._
 
-  def uploadPicture(cardID: String): Action[MultipartFormData[Files.TemporaryFile]] =
+
+  def uploadPicture(cardID: String, appVersion: String): Action[MultipartFormData[Files.TemporaryFile]] =
     silhouette.UserAwareAction.async(parse.multipartFormData) { implicit request =>
       implicit val uploadModelFormat = PictureUploadResponse.modelFormat
 
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         request.body.file("picture").map { picture =>
           val fileName = picture.filename
           val contentType = picture.contentType
@@ -75,9 +80,9 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
       }.recover(recoverFromInternalServerError)
     }
 
-  def getPicture(cardID: String, fileName: String): Action[AnyContent] =
+  def getPicture(cardID: String, fileName: String, appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         val uuid = identity.loginInfo.providerKey
         val pictureURI = DataVariables.pathToImage(uuid, cardID, fileName)
         cardService.retrievePicture(uuid, cardID, fileName).map{
@@ -87,9 +92,9 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
       }.recover(recoverFromInternalServerError)
     }
 
-  def getPicturesData: Action[AnyContent] =
+  def getPicturesData(appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         cardService.retrieveAll(identity.loginInfo.providerKey)
           .map{cards =>
             cards.flatMap( PictureDataResponse.fromCard )}
@@ -98,9 +103,9 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
       }.recover(recoverFromInternalServerError)
     }
 
-  def getScore(fbID: String): Action[AnyContent] =
+  def getScore(fbID: String, appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         cardService.computeTotalScore(fbID)
           .map{ score =>
             Ok(Json.toJson(ScoreResponse(score)))}
@@ -108,9 +113,9 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     }
 
 
-  def removePicture(cardID: String, fileName: String): Action[AnyContent] =
+  def removePicture(cardID: String, fileName: String, appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         val uuid = identity.loginInfo.providerKey
         val pictureURI = DataVariables.pathToImage(uuid, cardID, fileName)
         cardService.removePicture(uuid, cardID, fileName)
@@ -126,9 +131,9 @@ class CardController @Inject()(cardService: CardService, silhouette: Silhouette[
     }
 
 
-  def getAllScores: Action[AnyContent] =
+  def getAllScores(appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         cardService.computeTotalScoreAllUsers()
           .map{ namesAndScore =>
             Ok(

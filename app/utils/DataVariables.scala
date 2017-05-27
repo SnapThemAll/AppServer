@@ -17,11 +17,11 @@ object DataVariables extends Logger {
   val categories: Set[String] = ls(validationDir).map(_.getName).toSet
 
   private var cache: Queue[(String, Set[Descriptor])] = Queue.empty
-  private var cacheSize = 60
-  def cacheIsFull: Boolean = !(cache.size < cacheSize)
+  private var cacheMaxSize = 60
+  def cacheIsFull: Boolean = !(cache.size < cacheMaxSize)
   def getValidationDescriptors(category: String): Set[Descriptor] = {
     cache.find( _._1 == category ).map(_._2).getOrElse{
-      if(cache.size <= cacheSize){
+      if(cache.size <= cacheMaxSize){
         val descriptors = listValidationFileNames(category)
           .map(fileName => Descriptor.fromImagePath(pathToValidationImage(category, fileName)))
         cache = cache.enqueue(category -> descriptors)

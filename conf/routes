@@ -3,25 +3,44 @@
 # ~~~~
 
 # Home page
-GET     /                               controllers.Application.index
-GET     /isauthenticated                controllers.Application.isAuthenticated
-GET     /signout                        controllers.Application.signOut
+GET     /                                   controllers.Application.index
+GET     /isauthenticated                    controllers.Application.isAuthenticated
+GET     /signout                            controllers.Application.signOut
 
-GET     /authenticate/:provider         controllers.SocialAuth.authenticate(provider)
-GET     /authenticate/token/:provider   controllers.SocialAuth.authenticateToken(provider)
+GET     /authenticate/:provider             controllers.SocialAuth.authenticate(provider)
+GET     /authenticate/token/:provider       controllers.SocialAuth.authenticateToken(provider)
 
 #GET GAME DATA
-#GET     /getlevels                      controllers.GameController.getLevels
-GET     /getworldusers                  controllers.CardController.getAllScores
+GET     /:ver/getworldusers                 controllers.CardController.getAllScores(ver)
 
 #GET CARD DATA
-GET     /getpic/:cardName/:fileName     controllers.CardController.getPicture(cardName, fileName)
-GET     /getpicdata                     controllers.CardController.getPicturesData
-GET     /getscore/:fbID                 controllers.CardController.getScore(fbID)
+GET     /:ver/getpic/:cardName/:fileName    controllers.CardController.getPicture(cardName, fileName, ver)
+GET     /:ver/getpicdata                    controllers.CardController.getPicturesData(ver)
+GET     /:ver/getscore/:fbID                controllers.CardController.getScore(fbID, ver)
 
 #ADD/REMOVE CARD DATA
-POST    /uploadpic/:cardName            controllers.CardController.uploadPicture(cardName)
-GET     /removepic/:cardName/:fileName  controllers.CardController.removePicture(cardName, fileName)
+POST    /:ver/uploadpic/:cardName           controllers.CardController.uploadPicture(cardName, ver)
+GET     /:ver/removepic/:cardName/:fileName controllers.CardController.removePicture(cardName, fileName, ver)
 
 #UX
-POST    /uploadfeedback                 controllers.UXController.uploadFeedback
+POST    /:ver/uploadfeedback                controllers.UXController.uploadFeedback(ver)
+
+
+
+
+## OLD VERSION
+#GET GAME DATA
+#GET     /getlevels                         controllers.GameController.getLevels
+GET     /getworldusers                      controllers.CardController.getAllScores(outOfDate)
+
+#GET CARD DATA
+GET     /getpic/:cardName                   controllers.CardController.getPicture(cardName, fileName, outOfDate)
+GET     /getpicdata                         controllers.CardController.getPicturesData(outOfDate)
+GET     /getscore/:fbID                     controllers.CardController.getScore(fbID, outOfDate)
+
+#ADD/REMOVE CARD DATA
+POST    /uploadpic/:cardName                controllers.CardController.uploadPicture(cardName, outOfDate)
+GET     /removepic/:cardName/:fileName      controllers.CardController.removePicture(cardName, fileName, outOfDate)
+
+#UX
+POST    /uploadfeedback                     controllers.UXController.uploadFeedback(outOfDate)

@@ -11,14 +11,14 @@ import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
-class GameController @Inject()(silhouette: Silhouette[DefaultEnv]) extends Controller {
+class GameController @Inject()(controllerUtils: ControllerUtils, silhouette: Silhouette[DefaultEnv]) extends Controller {
 
-  import Utils._
+  import controllerUtils._
   val pathToFile: String = DataVariables.absolutePathToData + "levels.json"
 
-  def getLevels: Action[AnyContent] =
+  def getLevels(appVersion: String): Action[AnyContent] =
     silhouette.UserAwareAction.async { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         val file = new File(pathToFile)
         if (file.exists()) {
           Future.successful(Ok.sendFile(file))

@@ -1,17 +1,21 @@
 package models.daos
 
 import com.google.inject.{Inject, Singleton}
-import models.{Descriptor, ValidationCategory}
+import models.{Descriptor, Update, ValidationCategory}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import utils.DataVariables.{categories, computeClutterDescriptors, cacheIsFull, getValidationDescriptors}
+import utils.DataVariables.{cacheIsFull, categories, computeClutterDescriptors, getValidationDescriptors}
 import utils.Logger
 
 import scala.concurrent.Future
 
 @Singleton
-class Init @Inject() (validationCategoryDAO: ValidationCategoryDAO) extends Logger {
+class Init @Inject() (updateDAO: UpdateDAO, validationCategoryDAO: ValidationCategoryDAO) extends Logger {
 
   log("Checking if init is needed")
+
+  updateDAO.save(
+    Update("1.0", serverIsUpdating = false)
+  )
 
   Future.sequence{
     categories

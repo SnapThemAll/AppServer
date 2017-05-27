@@ -13,13 +13,17 @@ import utils.auth.DefaultEnv
   *
   * Check conf.routes to see what URL to use for your requests
   */
-class UXController @Inject()(feedbackService: FeedbackService, silhouette: Silhouette[DefaultEnv]) extends Controller {
+class UXController @Inject()(
+                              controllerUtils: ControllerUtils,
+                              feedbackService: FeedbackService,
+                              silhouette: Silhouette[DefaultEnv]
+                            ) extends Controller {
 
-  import Utils._
+  import controllerUtils._
 
-  def uploadFeedback: Action[String] =
+  def uploadFeedback(appVersion: String): Action[String] =
     silhouette.UserAwareAction.async(parse.text) { implicit request =>
-      verifyAuthentication(request) { identity =>
+      verifyAuthentication(appVersion)(request) { identity =>
         val msg = request.body
         feedbackService.save(msg, identity.loginInfo.providerKey)
           .map(_ => Ok)

@@ -21,10 +21,12 @@ class BaseModule extends AbstractModule with ScalaModule with AkkaGuiceSupport {
     bind[CardDAO].to[CardDAOMongo]
     bind[ValidationCategoryDAO].to[ValidationCategoryDAOMongo]
     bind[FeedbackDAO].to[FeedbackDAOMongo]
+    bind[UpdateDAO].to[UpdateDAOMongo]
 
     bind[AuthTokenService].to[AuthTokenServiceImpl]
     bind[UserService].to[UserServiceImpl]
     bind[CardService].to[CardServiceImpl]
     bind[FeedbackService].to[FeedbackServiceImpl]
+    bind[UpdateService].to[UpdateServiceImpl]
   }
 }

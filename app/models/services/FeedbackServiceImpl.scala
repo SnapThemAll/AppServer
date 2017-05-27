@@ -6,9 +6,6 @@ import models.daos.FeedbackDAO
 
 import scala.concurrent.Future
 
-/**
-  * Handles actions to cards.
-  */
 class FeedbackServiceImpl @Inject()(feedbackDAO: FeedbackDAO) extends FeedbackService {
 
   override def save(message: String, fbID: String): Future[Feedback] =

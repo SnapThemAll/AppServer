@@ -11,6 +11,6 @@ trait UpdateDAO {
 
   def save(update: Update): Future[Update]
 
-  def find(): Future[Option[Update]]
+  def find: Future[Option[Update]]
 
 }

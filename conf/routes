@@ -11,6 +11,9 @@ GET     /authenticate/:provider             controllers.SocialAuth.authenticate(
 GET     /authenticate/token/:provider       controllers.SocialAuth.authenticateToken(provider)
 
 #GET GAME DATA
+#GET     /getlevels                         controllers.GameController.getLevels
+GET     /:ver/getversion                    controllers.GameController.getVersion(ver)
+GET     /:ver/getnews                       controllers.GameController.getNews(ver)
 GET     /:ver/getworldusers                 controllers.CardController.getAllScores(ver)
 
 #GET CARD DATA

@@ -9,12 +9,12 @@ import scala.concurrent.Future
 class UpdateServiceImpl @Inject()(updateDAO: UpdateDAO) extends UpdateService {
 
   override def userNeedToUpdateApp(version: String): Future[Boolean] =
-    updateDAO.find().map( optUpdate =>
+    updateDAO.find.map( optUpdate =>
       optUpdate.exists(update => update.serverVersion != version)
     )
 
   override def serverIsUpdating(): Future[Boolean] =
-    updateDAO.find().map( optUpdate =>
+    updateDAO.find.map( optUpdate =>
       optUpdate.exists(update => update.serverIsUpdating)
     )
 }

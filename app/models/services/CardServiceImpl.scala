@@ -75,7 +75,7 @@ class CardServiceImpl @Inject()(
       .flatMap{ users =>
         Future.sequence(
           users
-            .map{ user => computeTotalScore(user.loginInfo.providerKey).map(score => user.name.getOrElse("No Name") -> score) }
+            .map{ user => computeTotalScore(user.loginInfo.providerKey).map(score => user.anonymousName -> score) }
         )
       }
   }

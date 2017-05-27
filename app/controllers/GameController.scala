@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Controller}
 import utils.DataVariables
 import utils.auth.DefaultEnv
@@ -33,7 +34,7 @@ class GameController @Inject()(controllerUtils: ControllerUtils, silhouette: Sil
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(appVersion)(request) { identity =>
         getMessage
-          .map(msg => Ok(msg.latestNews))
+          .map(msg => Ok(Json.obj("news" -> msg.latestNews)))
       }
     }
 
@@ -41,7 +42,7 @@ class GameController @Inject()(controllerUtils: ControllerUtils, silhouette: Sil
     silhouette.UserAwareAction.async { implicit request =>
       verifyAuthentication(appVersion)(request) { identity =>
         getMessage
-          .map(msg => Ok(msg.latestVersion))
+          .map(msg => Ok(Json.obj("version" -> msg.latestVersion)))
       }
     }
 }

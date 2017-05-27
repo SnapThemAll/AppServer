@@ -31,16 +31,16 @@ POST    /:ver/uploadfeedback                controllers.UXController.uploadFeedb
 ## OLD VERSION
 #GET GAME DATA
 #GET     /getlevels                         controllers.GameController.getLevels
-GET     /getworldusers                      controllers.CardController.getAllScores(appVersion = "outOfDate")
+GET     /getworldusers                      controllers.CardController.getAllScores(appVersion ?= "outOfDate")
 
 #GET CARD DATA
-GET     /getpic/:cardName                   controllers.CardController.getPicture(cardName, fileName, appVersion = "outOfDate")
-GET     /getpicdata                         controllers.CardController.getPicturesData(appVersion = "outOfDate")
-GET     /getscore/:fbID                     controllers.CardController.getScore(fbID, appVersion = "outOfDate")
+GET     /getpic/:cardName                   controllers.CardController.getPicture(cardName, fileName, appVersion ?= "outOfDate")
+GET     /getpicdata                         controllers.CardController.getPicturesData(appVersion ?= "outOfDate")
+GET     /getscore/:fbID                     controllers.CardController.getScore(fbID, appVersion ?= "outOfDate")
 
 #ADD/REMOVE CARD DATA
-POST    /uploadpic/:cardName                controllers.CardController.uploadPicture(cardName, appVersion = "outOfDate")
-GET     /removepic/:cardName/:fileName      controllers.CardController.removePicture(cardName, fileName, appVersion = "outOfDate")
+POST    /uploadpic/:cardName                controllers.CardController.uploadPicture(cardName, appVersion ?= "outOfDate")
+GET     /removepic/:cardName/:fileName      controllers.CardController.removePicture(cardName, fileName, appVersion ?= "outOfDate")
 
 #UX
-POST    /uploadfeedback                     controllers.UXController.uploadFeedback(appVersion = "outOfDate")
+POST    /uploadfeedback                     controllers.UXController.uploadFeedback(appVersion ?= "outOfDate")

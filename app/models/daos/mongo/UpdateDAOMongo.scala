@@ -23,7 +23,7 @@ class UpdateDAOMongo @Inject()(mongoDB: Mongo) extends UpdateDAO {
 
   override def save(update: Update): Future[Update] = {
     updateColl
-      .flatMap(_.update(Json.obj("uuid" -> "default"), update, upsert = true))
+      .flatMap(_.update(Json.obj("_id" -> "00000000-0000-0000-0000-000000000000"), update, upsert = true))
       .transform(
         _ => update,
         t => t
@@ -32,7 +32,7 @@ class UpdateDAOMongo @Inject()(mongoDB: Mongo) extends UpdateDAO {
 
   override def find: Future[Option[Update]] = {
     updateColl.flatMap(
-      _.find(Json.obj("uuid" -> "default")).one[Update]
+      _.find(Json.obj("_id" -> "00000000-0000-0000-0000-000000000000")).one[Update]
     )
   }
 }

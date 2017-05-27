@@ -25,11 +25,11 @@ class AuthTokenDAOMongo @Inject()(mongoDB: Mongo) extends AuthTokenDAO {
   /**
     * Finds a token by its ID.
     *
-    * @param id The unique token ID.
+    * @param _id The unique token ID.
     * @return The found token or None if no token for the given ID could be found.
     */
-  override def find(id: UUID): Future[Option[AuthToken]] = authTokenColl.flatMap(
-      _.find(Json.obj("id" -> id)).one[AuthToken]
+  override def find(_id: UUID): Future[Option[AuthToken]] = authTokenColl.flatMap(
+      _.find(Json.obj("_id" -> _id)).one[AuthToken]
   )
 
   /**
@@ -62,12 +62,12 @@ class AuthTokenDAOMongo @Inject()(mongoDB: Mongo) extends AuthTokenDAO {
   /**
     * Removes the token for the given ID.
     *
-    * @param id The ID for which the token should be removed.
+    * @param _id The ID for which the token should be removed.
     * @return A future to wait for the process to be completed.
     */
-  override def remove(id: UUID): Future[Unit] =
+  override def remove(_id: UUID): Future[Unit] =
     authTokenColl
-      .flatMap(_.remove(Json.obj("id" -> id)))
+      .flatMap(_.remove(Json.obj("_id" -> _id)))
       .transform(
           _ => (),
           t => t

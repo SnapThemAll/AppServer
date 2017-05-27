@@ -1,6 +1,4 @@
-import java.time.ZonedDateTime
-import java.util.{Calendar, Date}
+import java.util.UUID
 
-
-val date = ZonedDateTime.now().toString
-ZonedDateTime.parse(date)
+UUID.randomUUID()
+UUID.fromString("00000000-0000-0000-0000-000000000000")

@@ -5,7 +5,12 @@ import java.util.UUID
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Feedback(message: String, fbID: String, uuid: String = UUID.randomUUID().toString, date: ZonedDateTime = ZonedDateTime.now()){}
+case class Feedback(
+                     message: String,
+                     fbID: String,
+                     date: ZonedDateTime = ZonedDateTime.now(),
+                     _id: UUID = UUID.randomUUID()
+                   ){}
 
 object Feedback {
   implicit val jsonFormat: OFormat[Feedback] = Json.format[Feedback]

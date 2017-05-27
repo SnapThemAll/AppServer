@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 /**
   * The user object.
   *
-  * @param userID The unique ID of the user.
+  * @param _id The unique ID of the user.
   * @param loginInfo The linked login info.
   * @param firstName Maybe the first name of the authenticated user.
   * @param lastName Maybe the last name of the authenticated user.
@@ -17,7 +17,7 @@ import play.api.libs.json.Json
   * @param avatarURL Maybe the avatar URL of the authenticated provider.
   * @param activated Indicates that the user has activated its registration.
   */
-case class User(userID: UUID,
+case class User(_id: UUID,
                 loginInfo: LoginInfo,
                 firstName: Option[String],
                 lastName: Option[String],

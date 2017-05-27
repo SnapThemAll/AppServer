@@ -23,7 +23,7 @@ class FeedbackDAOMongo @Inject()(mongoDB: Mongo) extends FeedbackDAO {
 
   override def save(feedback: Feedback): Future[Feedback] = {
     feedbackColl
-      .flatMap(_.update(Json.obj("uuid" -> feedback.uuid, "date" -> feedback.date), feedback, upsert = true))
+      .flatMap(_.update(Json.obj("_id" -> feedback._id, "date" -> feedback.date), feedback, upsert = true))
       .transform(
         _ => feedback,
         t => t

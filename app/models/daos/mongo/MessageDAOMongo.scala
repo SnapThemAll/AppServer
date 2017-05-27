@@ -23,7 +23,7 @@ class MessageDAOMongo @Inject()(mongoDB: Mongo) extends MessageDAO {
 
   override def save(message: Message): Future[Message] = {
     messageColl
-      .flatMap(_.update(Json.obj("_id" -> "default"), message, upsert = true))
+      .flatMap(_.update(Json.obj("_id" -> "00000000-0000-0000-0000-000000000000"), message, upsert = true))
       .transform(
         _ => message,
         t => t
@@ -32,7 +32,7 @@ class MessageDAOMongo @Inject()(mongoDB: Mongo) extends MessageDAO {
 
   override def find: Future[Option[Message]] = {
     messageColl.flatMap(
-      _.find(Json.obj("_id" -> "default")).one[Message]
+      _.find(Json.obj("_id" -> "00000000-0000-0000-0000-000000000000")).one[Message]
     )
   }
 }

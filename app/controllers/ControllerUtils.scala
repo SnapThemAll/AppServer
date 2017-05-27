@@ -34,7 +34,7 @@ class ControllerUtils @Inject()(updateService: UpdateService) extends Logger {
           case false :: true :: Nil => // SERVER IS UPDATING
             Future.successful(
               Forbidden(
-                "We updating the server... " +
+                "Server is being updated... " +
                   "You can still take snaps. " +
                   "Then to compute their score at the same time, go to the 'Settings' tab.")
             )

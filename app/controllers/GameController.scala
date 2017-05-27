@@ -27,4 +27,11 @@ class GameController @Inject()(controllerUtils: ControllerUtils, silhouette: Sil
         }
       }.recover(recoverFromInternalServerError)
     }
+
+  def getNews(appVersion: String): Action[AnyContent] =
+    silhouette.UserAwareAction.async { implicit request =>
+      verifyAuthentication(appVersion)(request) { identity =>
+
+      }
+    }
 }

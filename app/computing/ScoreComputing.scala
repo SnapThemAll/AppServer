@@ -14,9 +14,6 @@ object ScoreComputing extends Logger {
 
     var score: Float = marginalGain / updatedValidationCategory.averageGain // SCORE = GAIN / AVERAGE GAIN
 
-    log(s"Category ${validationCategory.category} improved by $marginalGain} (the bigger the better). Score: $score")
-
-
     score = Math.min(score * 5, 10f) // [0, 10]
 
     if(score > 0 && score < 1){
@@ -25,6 +22,8 @@ object ScoreComputing extends Logger {
     if(score == 0){
       score += randomScore(.2f, 1f) // a little help (sometimes) if score == 0
     }
+
+    log(s"Category ${validationCategory.category} improved by $marginalGain} (the bigger the better). Score: $score")
 
     score -> updatedValidationCategory
   }

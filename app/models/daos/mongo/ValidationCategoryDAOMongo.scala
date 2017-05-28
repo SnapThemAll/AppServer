@@ -6,7 +6,6 @@ import models.daos.ValidationCategoryDAO
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{Json, OFormat}
 import reactivemongo.play.json._
-import utils.DataVariables.log
 
 import scala.concurrent.Future
 
@@ -23,25 +22,18 @@ class ValidationCategoryDAOMongo @Inject()(mongoDB: Mongo) extends ValidationCat
   private[this] def validationCategoryColl = mongoDB.collection("validation_category")
 
   override def save(validationCategory: ValidationCategory): Future[ValidationCategory] = {
-    log(s"Saving validation category ${validationCategory.category}")
-    val future =
       validationCategoryColl
         .flatMap(_.update(Json.obj("category" -> validationCategory.category), validationCategory, upsert = true))
         .transform(
           _ => validationCategory,
           t => t
         )
-    log(s"DONE")
-    future
   }
 
   override def find(category: String): Future[Option[ValidationCategory]] = {
-    log(s"Retrieving validation category $category")
-    val future = validationCategoryColl.flatMap(
+      validationCategoryColl.flatMap(
       _.find(Json.obj("category" -> category)).one[ValidationCategory]
     )
-    log(s"DONE")
-    future
   }
 }
 

@@ -2,6 +2,7 @@ package models.services
 
 import javax.inject.Inject
 
+import com.mohiva.play.silhouette.api.LoginInfo
 import computing.ScoreComputing
 import models._
 import models.daos.{CardDAO, UserDAO, ValidationCategoryDAO}
@@ -23,21 +24,22 @@ class CardServiceImpl @Inject()(
                                ) extends CardService with Logger {
 
   override def savePicture(fbID: String, cardID: String, fileName: String, descriptor: Descriptor): Future[Double] = {
-    log(s"Starts fetching category $cardID from the database...")
-    validationCategoryDAO.find(cardID).map(_.get)
-      .flatMap{ validationCategory =>
 
-        log(s"Category $cardID fetched. Starts Computing the score...")
-        val (score, newValidationCat) = ScoreComputing.computeScore(descriptor, validationCategory)
-        val picture = Picture(fileName, score)
+    userDAO.find(LoginInfo("facebook", fbID)).flatMap(user => {
+      val name = user.map(_.name.getOrElse("Unnamed user")).getOrElse("Not found user")
+      log(s"$name uploading a picture of $cardID in the database...")
+      validationCategoryDAO.find(cardID).map(_.get)
+        .flatMap{ validationCategory =>
 
-        log(s"Score computed. Saving $cardID category in the database...")
-        validationCategoryDAO.save(newValidationCat).flatMap{_ =>
-          log(s"Category $cardID saved. Sending the score back.")
-          cardDAO.savePicture(fbID, cardID, picture)
-            .map(_ => score)
+          val (score, newValidationCat) = ScoreComputing.computeScore(descriptor, validationCategory)
+          val picture = Picture(fileName, score)
+
+          validationCategoryDAO.save(newValidationCat).flatMap{_ =>
+            cardDAO.savePicture(fbID, cardID, picture)
+              .map(_ => score)
+          }
         }
-      }
+    })
   }
 
   override def retrieve(fbID: String, cardID: String): Future[Option[Card]] = {

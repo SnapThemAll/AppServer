@@ -1,4 +1,0 @@
-import java.util.UUID
-
-UUID.randomUUID()
-UUID.fromString("00000000-0000-0000-0000-000000000000")

@@ -23,7 +23,7 @@ object ScoreComputing extends Logger {
       score += randomScore(.2f, 1f) // a little help (sometimes) if score == 0
     }
 
-    log(s"Category ${validationCategory.category} improved by $marginalGain} (the bigger the better). Score: $score")
+    log(s"Category ${validationCategory.category} improved by $marginalGain. Score: $score")
 
     score -> updatedValidationCategory
   }

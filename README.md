@@ -1,2 +1,2 @@
-# Server
-Server part of Snap Them All mobile app
+# SnapThemAll - Server
+Back-End of Snap Them All mobile app
